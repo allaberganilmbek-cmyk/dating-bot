@@ -1,0 +1,1297 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Знакомства & Встречи в Узбекистане и не только </title>
+    
+    <!-- Telegram WebApp SDK -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+    <!-- Google Search Verification -->
+    <meta name="google-site-verification" content="q2i0tuwRI_KIDqv-KdtyqbgpbPmCJT_UuJWCUL3FEqE" />
+
+    <!-- Яндекс Метрика -->
+    <script type="text/javascript">
+        (function(m,e,t,r,i,k,a){
+            m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+            m[i].l=1*new Date();
+            for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
+            k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)
+        })(window, document,'script','https://mc.yandex.ru/metrika/tag.js?id=112081636', 'ym');
+
+        ym(112081636, 'init', {ssr:true, webvisor:true, clickmap:true, ecommerce:"dataLayer", referrer: document.referrer, url: location.href, accurateTrackBounce:true, trackLinks:true});
+    </script>
+    <noscript><div><img src="https://mc.yandex.ru/watch/112081636" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+
+    <!-- Google Maps API -->
+    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places" async defer></script>
+
+    <style>
+        :root {
+            --bg-color: #0b0f19;
+            --card-bg: #111827;
+            --input-bg: #1e293b;
+            --accent: #3b82f6;
+            --accent-gradient: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            --text-main: #ffffff;
+            --text-sub: #94a3b8;
+            --border-color: #334155;
+            --user-msg: #0284c7;
+            --match-msg: #334155;
+            --success: #22c55e;
+            --danger: #ef4444;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        body { background-color: var(--bg-color); color: var(--text-main); display: flex; justify-content: center; align-items: center; min-height: 100vh; overflow: hidden; }
+
+        .toast-notification {
+            position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-100px);
+            background: rgba(30, 41, 59, 0.95); border: 1px solid var(--accent);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5); backdrop-filter: blur(8px);
+            border-radius: 14px; padding: 12px 18px; display: flex; align-items: center; gap: 12px;
+            z-index: 10000; width: 90%; max-width: 400px;
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); cursor: pointer;
+        }
+
+        .toast-notification.show { transform: translateX(-50%) translateY(0); }
+
+        .disclaimer-overlay {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background-color: var(--bg-color); z-index: 9999; display: flex;
+            justify-content: center; align-items: center; padding: 20px;
+        }
+
+        .disclaimer-card {
+            background: var(--card-bg); border: 1px solid var(--border-color);
+            border-radius: 20px; padding: 24px; max-width: 400px; width: 100%;
+            text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            display: flex; flex-direction: column; gap: 16px;
+        }
+
+        .container {
+            width: 100%; max-width: 440px; height: 100vh;
+            background-color: var(--card-bg); display: flex;
+            flex-direction: column; overflow: hidden; position: relative;
+            border-left: 1px solid var(--border-color); border-right: 1px solid var(--border-color);
+        }
+
+        .screen {
+            display: none; flex-direction: column; width: 100%; height: 100%;
+            padding: 20px; overflow-y: auto; padding-bottom: 75px; scroll-behavior: smooth;
+        }
+
+        .screen.active { display: flex; animation: fadeIn 0.25s ease-in-out; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.98); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .form-header { text-align: center; margin-bottom: 16px; }
+        .form-header h2 { font-size: 1.5rem; font-weight: 700; color: #fff; margin-bottom: 4px; }
+        .form-header p { color: var(--text-sub); font-size: 0.85rem; }
+
+        .form-group { margin-bottom: 14px; display: flex; flex-direction: column; }
+        label { font-size: 0.72rem; color: var(--text-sub); margin-bottom: 4px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+
+        input, select, textarea {
+            padding: 10px 12px; border-radius: 10px; border: 1px solid var(--border-color);
+            background-color: var(--input-bg); color: var(--text-main); font-size: 0.9rem; outline: none; transition: all 0.2s ease;
+        }
+
+        input:focus, select:focus, textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.25); }
+
+        .row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+        .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+
+        .checkbox-group { display: flex; gap: 16px; align-items: center; margin-top: 4px; }
+        .checkbox-label { display: flex; align-items: center; gap: 6px; font-size: 0.8rem; color: var(--text-main); cursor: pointer; text-transform: uppercase; font-weight: 600; }
+        .checkbox-label input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--accent); cursor: pointer; }
+
+        .btn {
+            background: var(--accent-gradient); color: white; border: none; padding: 12px;
+            border-radius: 12px; font-size: 0.95rem; font-weight: 700; cursor: pointer;
+            margin-top: auto; text-align: center; box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3); transition: transform 0.1s, opacity 0.2s;
+        }
+
+        .btn:active { transform: scale(0.97); }
+        .btn-secondary { background: transparent; border: 1px solid var(--border-color); color: var(--text-sub); box-shadow: none; }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .profile-card {
+            flex: 1; border-radius: 20px; overflow: hidden; background: var(--input-bg);
+            border: 1px solid var(--border-color); display: flex; flex-direction: column; position: relative;
+        }
+
+        .profile-card-image { width: 100%; height: 260px; background-size: cover; background-position: center; position: relative; user-select: none; }
+        .profile-card-image-overlay { position: absolute; bottom: 0; left: 0; right: 0; padding: 15px; background: linear-gradient(to top, rgba(15,23,42,1), transparent); }
+        .profile-card-body { padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; font-size: 0.88rem; }
+
+        .photo-story-bars { position: absolute; top: 10px; left: 10px; right: 10px; display: flex; gap: 4px; z-index: 20; }
+        .photo-story-bar { flex: 1; height: 3px; background: rgba(255,255,255,0.3); border-radius: 2px; transition: background 0.2s; }
+        .photo-story-bar.active { background: #ffffff; }
+
+        .badge-grid { display: flex; flex-wrap: wrap; gap: 6px; }
+        .badge { background: #0f172a; border: 1px solid var(--border-color); padding: 4px 10px; border-radius: 8px; font-size: 0.78rem; color: var(--text-sub); }
+        .badge-accent { background: rgba(59, 130, 246, 0.15); border-color: var(--accent); color: var(--text-main); }
+
+        .actions { display: flex; justify-content: space-around; margin-top: 12px; align-items: center; }
+        .action-btn { width: 56px; height: 56px; border-radius: 50%; border: none; font-size: 1.4rem; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .like { background-color: var(--success); color: white; }
+        .dislike { background-color: var(--danger); color: white; }
+
+        .avatar-img { width: 45px; height: 45px; border-radius: 50%; object-fit: cover; border: 1px solid var(--border-color); }
+        .avatar-small { width: 35px; height: 35px; border-radius: 50%; object-fit: cover; cursor: pointer; }
+
+        .chat-header { display: flex; align-items: center; justify-content: space-between; padding-bottom: 12px; border-bottom: 1px solid var(--border-color); margin-bottom: 12px; gap: 6px; }
+        .chat-messages { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; scroll-behavior: smooth; }
+        .message { max-width: 85%; padding: 10px 14px; border-radius: 16px; font-size: 0.88rem; line-height: 1.35; word-break: break-word; }
+        .message.user { background-color: var(--user-msg); align-self: flex-end; }
+        .message.match { background-color: var(--match-msg); align-self: flex-start; }
+
+        .blur-text { filter: blur(4px); user-select: none; }
+        .chat-input { display: flex; gap: 8px; margin-top: 10px; align-items: center; }
+        .chat-list-item { display: flex; flex-direction: column; gap: 10px; padding: 12px; background: var(--input-bg); border-radius: 14px; border: 1px solid var(--border-color); margin-bottom: 8px; }
+        .chat-item-header { display: flex; align-items: center; gap: 12px; }
+        .count-badge { background: var(--danger); color: #fff; font-size: 0.72rem; font-weight: bold; padding: 2px 7px; border-radius: 10px; }
+        .request-actions { display: flex; gap: 8px; margin-top: 4px; }
+
+        .bottom-nav {
+            position: absolute; bottom: 0; left: 0; right: 0; height: 65px;
+            background: var(--card-bg); border-top: 1px solid var(--border-color);
+            display: none; justify-content: space-around; align-items: center; z-index: 40;
+        }
+
+        .bottom-nav.active { display: flex; }
+        .nav-item { background: none; border: none; color: var(--text-sub); font-size: 0.7rem; display: flex; flex-direction: column; align-items: center; gap: 3px; cursor: pointer; flex: 1; position: relative; }
+        .nav-badge { position: absolute; top: 2px; right: 22%; background: var(--danger); color: #fff; font-size: 0.65rem; font-weight: bold; padding: 1px 5px; border-radius: 8px; display: none; }
+        .nav-item.active { color: var(--accent); font-weight: 700; }
+
+        .map-modal { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: var(--card-bg); display: none; flex-direction: column; z-index: 50; padding: 16px; }
+        .map-modal.active { display: flex; }
+        #map { width: 100%; flex: 1; border-radius: 14px; margin: 10px 0; border: 1px solid var(--border-color); background-color: #1e293b; }
+
+        .geo-toggle-box { display: flex; align-items: center; justify-content: space-between; background: var(--input-bg); padding: 10px 14px; border-radius: 10px; border: 1px solid var(--border-color); margin-bottom: 14px; }
+        .type-subform { background: rgba(15, 23, 42, 0.6); border: 1px dashed var(--accent); border-radius: 14px; padding: 12px; margin-top: 10px; display: flex; flex-direction: column; gap: 10px; }
+        .banner-accept-box { background: rgba(59, 130, 246, 0.1); border: 1px solid var(--accent); border-radius: 14px; padding: 12px; margin-bottom: 10px; text-align: center; }
+
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; z-index: 100; padding: 20px; backdrop-filter: blur(4px); }
+        .modal-overlay.active { display: flex; }
+        .modal-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 20px; padding: 20px; width: 100%; max-width: 360px; display: flex; flex-direction: column; gap: 12px; max-height: 80vh; overflow-y: auto; }
+        
+        .preview-thumbnails { display: flex; gap: 8px; overflow-x: auto; margin-top: 6px; padding-bottom: 4px; }
+        .preview-thumb { width: 50px; height: 50px; border-radius: 8px; object-fit: cover; border: 1px solid var(--border-color); }
+    </style>
+</head>
+<body>
+
+<div id="toast-banner" class="toast-notification">
+    <div style="font-size: 1.5rem;">💬</div>
+    <div style="flex: 1; overflow: hidden;">
+        <h5 id="toast-title" style="color: #fff; font-size: 0.85rem;">Новое сообщение</h5>
+        <p id="toast-body" style="color: var(--text-sub); font-size: 0.78rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px;">Текст сообщения...</p>
+    </div>
+</div>
+
+<div id="disclaimer-modal" class="disclaimer-overlay">
+    <div class="disclaimer-card">
+        <div style="font-size: 3rem;">⚠️</div>
+        <h2 style="font-size: 1.2rem; color: #fff;">Отказ от ответственности</h2>
+        <p style="font-size: 0.9rem; color: var(--text-sub); line-height: 1.4;">
+            Мы не несем ответственность за действия пользователей.
+        </p>
+        <div style="display: flex; gap: 10px; margin-top: 10px;">
+            <button class="btn btn-secondary" style="flex: 1; color: var(--danger); border-color: var(--danger);" onclick="declineDisclaimer()">Не согласен</button>
+            <button class="btn" style="flex: 1; margin: 0;" onclick="acceptDisclaimer()">Согласен</button>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+
+    <!-- ЭКРАН 1: Анкета -->
+    <div id="screen-step1" class="screen active">
+        <div class="form-header">
+            <h2>Ваша анкета</h2>
+            <p>Заполните данные о себе</p>
+        </div>
+
+        <form style="display: flex; flex-direction: column; flex: 1;" onsubmit="goToStep2(event)">
+            <div class="form-group"><label>ФИО</label><input type="text" id="reg-name" placeholder="Иван Иванов" required></div>
+            <div class="form-group"><label>ВОЗРАСТ</label><input type="number" id="reg-age" placeholder="25" required></div>
+            
+            <div class="form-group">
+                <label>Фотографии профиля (Галерея)</label>
+                <input type="file" id="reg-photos-input" accept="image/*" multiple style="display: none;" onchange="handleProfilePhotosUpload(event)">
+                <button type="button" class="btn btn-secondary" style="margin-top:0;" onclick="document.getElementById('reg-photos-input').click()">🖼️ Выбрать фото из телефона</button>
+                <div class="preview-thumbnails" id="profile-photos-preview"></div>
+            </div>
+
+            <div class="form-group"><label>УВЛЕЧЕНИЯ</label><input type="text" id="reg-hobbies" placeholder="Спорт, авто, путешествия"></div>
+            <div class="form-group">
+                <label>РОД ДЕЯТЕЛЬНОСТИ</label>
+                <select id="reg-job" required>
+                    <option value="" disabled selected hidden>Инженер, программист...</option>
+                    <option value="Образование и наука">Образование и наука</option>
+                    <option value="IT, интернет и технологии">IT, интернет и технологии</option>
+                    <option value="Финансы, банки и инвестиции">Финансы, банки и инвестиции</option>
+                    <option value="Медицина и фармацевтика">Медицина и фармацевтика</option>
+                    <option value="Искусство, дизайн и медиа">Искусство, дизайн и медиа</option>
+                    <option value="Бизнес, управление и продажи">Бизнес, управление и продажи</option>
+                    <option value="Маркетинг, PR и реклама">Маркетинг, PR и реклама</option>
+                    <option value="Юриспруденция и право">Юриспруденция и право</option>
+                    <option value="Строительство и архитектура">Строительство и архитектура</option>
+                    <option value="Сфера услуг и туризм">Сфера услуг и туризм</option>
+                    <option value="Студент / Учащийся">Студент / Учащийся</option>
+                    <option value="Другое">Другое</option>
+                </select>
+            </div>
+            <div class="form-group"><label>БЫСТРЫЕ ТЕМЫ ДЛЯ РАЗГОВОРА</label><textarea id="reg-topics" rows="2" style="resize: none;" placeholder="Кино, музыка, IT..."></textarea></div>
+            <div class="form-group">
+                <label>ЦЕЛЬ ЗНАКОМСТВА</label>
+                <div class="checkbox-group">
+                    <label class="checkbox-label"><input type="checkbox" name="goal" value="Быстрые"> БЫСТРЫЕ</label>
+                    <label class="checkbox-label"><input type="checkbox" name="goal" value="Долгосрочные"> ДОЛГОСРОЧНЫЕ</label>
+                </div>
+            </div>
+            <div class="row-3" style="margin-top: 4px; margin-bottom: 10px;">
+                <div class="form-group" style="margin-bottom:0;"><label>Пол *</label><select id="reg-gender" required style="padding: 8px;"><option value="Мужчина">Муж</option><option value="Женщина">Жен</option></select></div>
+                <div class="form-group" style="margin-bottom:0;"><label>Рост (см)</label><input type="number" id="reg-height" placeholder="180" style="padding: 8px;"></div>
+                <div class="form-group" style="margin-bottom:0;"><label>Вес (кг)</label><input type="number" id="reg-weight" placeholder="75" style="padding: 8px;"></div>
+            </div>
+            <button type="submit" class="btn">Далее</button>
+        </form>
+    </div>
+
+    <!-- ЭКРАН 2: География и Система рекомендаций -->
+    <div id="screen-step2" class="screen">
+        <h2 style="text-align: center; color: var(--accent); margin-bottom: 15px;">Гео и Рекомендации</h2>
+        <div class="geo-toggle-box">
+            <div>
+                <span style="font-size: 0.85rem; font-weight: 700; display: block;">Геолокация</span>
+                <span id="geo-status-text" style="font-size: 0.75rem; color: var(--text-sub);">Выключена (ручной ввод)</span>
+            </div>
+            <input type="checkbox" id="geo-toggle-switch" onchange="toggleGeoMode()" style="width: 20px; height: 20px; accent-color: var(--accent); cursor: pointer;">
+        </div>
+
+        <form style="display: flex; flex-direction: column; gap: 10px;" onsubmit="completeRegistration(event)">
+            <div class="form-group">
+                <label>СИСТЕМА РЕКОМЕНДАЦИЙ (ТИПАЖ)</label>
+                <select id="recommendation-preference" onchange="toggleTypeFields()" required>
+                    <option value="any" selected>🌐 Не важно (все анкеты)</option>
+                    <option value="strict-job">🎯 Только по моему роду деятельности / схожий типаж</option>
+                    <option value="strict-type">⭐ Учитывать Задать типаж</option>
+                </select>
+            </div>
+
+            <div id="inline-type-box" class="type-subform" style="display: none;">
+                <div class="row-2">
+                    <div class="form-group" style="margin-bottom:0;"><label>Рост от (см)</label><input type="number" id="step2-pref-height-min" placeholder="160"></div>
+                    <div class="form-group" style="margin-bottom:0;"><label>Рост до (см)</label><input type="number" id="step2-pref-height-max" placeholder="180"></div>
+                </div>
+                <div class="row-2">
+                    <div class="form-group" style="margin-bottom:0;"><label>Вес от (кг)</label><input type="number" id="step2-pref-weight-min" placeholder="45"></div>
+                    <div class="form-group" style="margin-bottom:0;"><label>Вес до (кг)</label><input type="number" id="step2-pref-weight-max" placeholder="70"></div>
+                </div>
+                <div class="form-group" style="margin-bottom:0;">
+                    <label>РОД ДЕЯТЕЛЬНОСТИ</label>
+                    <select id="step2-pref-job">
+                        <option value="">Не имеет значения</option>
+                        <option value="Образование и наука">Образование и наука</option>
+                        <option value="IT, интернет и технологии">IT, интернет и технологии</option>
+                        <option value="Финансы, банки и инвестиции">Финансы, банки и инвестиции</option>
+                        <option value="Медицина и фармацевтика">Медицина и фармацевтика</option>
+                        <option value="Искусство, дизайн и медиа">Искусство, дизайн и медиа</option>
+                        <option value="Бизнес, управление и продажи">Бизнес, управление и продажи</option>
+                        <option value="Маркетинг, PR и реклама">Маркетинг, PR и реклама</option>
+                        <option value="Юриспруденция и право">Юриспруденция и право</option>
+                        <option value="Строительство и архитектура">Строительство и архитектура</option>
+                        <option value="Сфера услуг и туризм">Сфера услуг и туризм</option>
+                        <option value="Студент / Учащийся">Студент / Учащийся</option>
+                        <option value="Другое">Другое</option>
+                    </select>
+                </div>
+                <div class="form-group" style="margin-bottom:0;">
+                    <label>ЦВЕТ ВОЛОС</label>
+                    <select id="step2-pref-hair">
+                        <option value="">Не имеет значения</option>
+                        <option value="Брюнет / Брюнетка">Брюнет / Брюнетка</option>
+                        <option value="Блондин / Блондинка">Блондин / Блондинка</option>
+                        <option value="Шатен / Шатенка">Шатен / Шатенка</option>
+                        <option value="Рыжий / Рыжая">Рыжий / Рыжая</option>
+                        <option value="Русый / Русая">Русый / Русая</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group" id="manual-region-group" style="display:flex;">
+                <label>Часть света / Регион *</label>
+                <select id="geo-region" onchange="onRegionChange()">
+                    <option value="" disabled selected hidden>Выберите регион</option>
+                    <option value="sng">Страны СНГ</option>
+                    <option value="europe">Европа</option>
+                    <option value="west">Запад и США</option>
+                    <option value="asia">Азия и Ближний Восток</option>
+                </select>
+            </div>
+            <div class="form-group" id="manual-country-group" style="display:flex;">
+                <label>Страна *</label>
+                <select id="geo-country" onchange="onCountryChange()" disabled><option value="">Сначала выберите регион</option></select>
+            </div>
+            <div class="form-group" id="manual-city-group" style="display:flex;">
+                <label>Город *</label>
+                <input type="text" id="geo-city" list="cities-list" placeholder="Выберите или введите город..." disabled>
+                <datalist id="cities-list"></datalist>
+            </div>
+
+            <div style="margin-top: 15px; display: flex; gap: 10px;">
+                <button type="button" class="btn btn-secondary" style="flex:1;" onclick="showScreen('screen-step1')">Назад</button>
+                <button type="submit" class="btn" id="reg-submit-btn" style="flex:2;">Сохранить и поискать</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- ЭКРАН 3: Карточки (Поиск) -->
+    <div id="screen-swipe" class="screen">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+            <span id="user-location-tag" style="font-size: 0.8rem; color: var(--text-sub);">📍 Не указано</span>
+            <button class="btn btn-secondary" style="padding: 4px 8px; font-size: 0.75rem;" onclick="showScreen('screen-step2')">Гео / Изменить</button>
+        </div>
+        <div id="card-container" style="flex: 1; display: flex; flex-direction: column;"></div>
+        <div class="actions" id="swipe-actions">
+            <button class="action-btn dislike" onclick="handleSwipe(false)">✖</button>
+            <button class="btn btn-secondary" style="padding: 6px 10px; font-size: 0.72rem; color: var(--danger); border-color: var(--danger);" onclick="reportOrBlockCurrentProfile()">⚠️ Жалоба / Блок</button>
+            <button class="action-btn like" onclick="handleSwipe(true)">❤️</button>
+        </div>
+    </div>
+
+    <!-- ЭКРАН 4: Типаж -->
+    <div id="screen-preference" class="screen">
+        <div class="form-header">
+            <h2>Задать типаж</h2>
+            <p>Параметры идеального партнёра</p>
+        </div>
+        <form style="display: flex; flex-direction: column; gap: 12px;" onsubmit="saveTargetType(event)">
+            <div class="row-2">
+                <div class="form-group" style="margin-bottom:0;"><label>Рост от (см)</label><input type="number" id="pref-height-min" placeholder="160"></div>
+                <div class="form-group" style="margin-bottom:0;"><label>Рост до (см)</label><input type="number" id="pref-height-max" placeholder="185"></div>
+            </div>
+            <div class="row-2">
+                <div class="form-group" style="margin-bottom:0;"><label>Вес от (кг)</label><input type="number" id="pref-weight-min" placeholder="45"></div>
+                <div class="form-group" style="margin-bottom:0;"><label>Вес до (кг)</label><input type="number" id="pref-weight-max" placeholder="75"></div>
+            </div>
+            <div class="form-group">
+                <label>СФЕРА ДЕЯТЕЛЬНОСТИ</label>
+                <select id="pref-job">
+                    <option value="">Не имеет значения</option>
+                    <option value="Образование и наука">Образование и наука</option>
+                    <option value="IT, интернет и технологии">IT, интернет и технологии</option>
+                    <option value="Финансы, банки и инвестиции">Финансы, банки и инвестиции</option>
+                    <option value="Медицина и фармацевтика">Медицина и фармацевтика</option>
+                    <option value="Искусство, дизайн и медиа">Искусство, дизайн и медиа</option>
+                    <option value="Бизнес, управление и продажи">Бизнес, управление и продажи</option>
+                    <option value="Маркетинг, PR и реклама">Маркетинг, PR и реклама</option>
+                    <option value="Юриспруденция и право">Юриспруденция и право</option>
+                    <option value="Строительство и архитектура">Строительство и архитектура</option>
+                    <option value="Сфера услуг и туризм">Сфера услуг и туризм</option>
+                    <option value="Студент / Учащийся">Студент / Учащийся</option>
+                    <option value="Другое">Другое</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>ЦВЕТ ВОЛОС</label>
+                <select id="pref-hair">
+                    <option value="">Не имеет значения</option>
+                    <option value="Брюнет / Брюнетка">Брюнет / Брюнетка</option>
+                    <option value="Блондин / Блондинка">Блондин / Блондинка</option>
+                    <option value="Шатен / Шатенка">Шатен / Шатенка</option>
+                    <option value="Рыжий / Рыжая">Рыжий / Рыжая</option>
+                    <option value="Русый / Русая">Русый / Русая</option>
+                </select>
+            </div>
+            <button type="submit" class="btn" style="margin-top: 10px;">Сохранить типаж</button>
+        </form>
+    </div>
+
+    <!-- ЭКРАН 5: Список чатов -->
+    <div id="screen-chats-list" class="screen">
+        <h2 style="margin-bottom: 15px; font-size: 1.3rem;">Ваши сообщения</h2>
+        <div id="chats-container" style="flex: 1; overflow-y: auto;">
+            <p style="color: var(--text-sub); font-size: 0.9rem; text-align: center; margin-top: 40px;">Загрузка сообщений...</p>
+        </div>
+    </div>
+
+    <!-- ЭКРАН 6: Чат -->
+    <div id="screen-chat" class="screen">
+        <div class="chat-header">
+            <button class="btn btn-secondary" style="padding: 5px 8px; font-size: 0.75rem;" onclick="showScreen('screen-chats-list')">← Назад</button>
+            <div style="display: flex; align-items: center; gap: 8px; cursor: pointer;" onclick="openPartnerProfileModal()">
+                <img id="chat-partner-avatar" class="avatar-small" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200" alt="avatar">
+                <h3 id="chat-partner-name" style="font-size: 0.95rem; text-decoration: underline; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100px;">Имя</h3>
+            </div>
+            <button class="btn" style="padding: 5px 8px; font-size: 0.75rem; margin:0;" onclick="openMapModal()">📍 Место</button>
+            <button class="btn btn-secondary" style="padding: 5px 8px; font-size: 0.72rem; color: var(--danger); border-color: var(--danger); margin:0;" onclick="blockChatPartner()">🚫 Блок</button>
+        </div>
+
+        <div id="chat-request-banner" class="banner-accept-box" style="display: none;">
+            <p style="font-size: 0.85rem; color: #fff; margin-bottom: 8px;">Пользователь хочет начать с вами общение.</p>
+            <div style="display: flex; gap: 8px;">
+                <button class="btn btn-secondary" style="flex: 1; padding: 6px; font-size: 0.75rem; color: var(--danger); border-color: var(--danger);" onclick="ignoreChatRequest(activePartner)">Игнор / Блок</button>
+                <button class="btn" style="flex: 1; padding: 6px; font-size: 0.75rem; margin:0;" onclick="acceptChatRequest(activePartner)">Принять</button>
+            </div>
+        </div>
+
+        <div class="chat-messages" id="chat-messages"></div>
+
+        <div class="chat-input" id="chat-input-box">
+            <button class="btn btn-secondary" id="chat-file-btn" style="padding: 8px 10px; margin-top:0;" onclick="triggerMediaUpload()" title="Отправить фото/видео">📎</button>
+            <input type="file" id="media-file-input" accept="image/*" style="display: none;" onchange="handleFileSelected(event)">
+            <input type="text" id="chat-input-field" placeholder="Напишите сообщение..." onkeydown="if(event.key==='Enter') window.sendMessage()">
+            <button class="btn" id="chat-send-btn" style="margin-top:0; padding: 10px 15px;" onclick="window.sendMessage()">➤</button>
+        </div>
+    </div>
+
+    <!-- ЭКРАН 7: Мой профиль -->
+    <div id="screen-profile" class="screen">
+        <h2 style="margin-bottom: 15px; font-size: 1.3rem; text-align: center;">Мой профиль</h2>
+        <div class="profile-card" style="flex: unset; padding: 20px; gap: 15px;">
+            <div id="profile-info-block" style="display: flex; flex-direction: column; gap: 8px; font-size: 0.9rem;"></div>
+        </div>
+        <div style="margin-top: 20px; display: flex; flex-direction: column; gap: 10px;">
+            <button class="btn btn-secondary" onclick="openBlacklistModal()">🚫 Черный список (Заблокированные)</button>
+            <button class="btn btn-secondary" onclick="showScreen('screen-step1')">✏️ Редактировать анкету</button>
+            <button class="btn btn-secondary" onclick="showScreen('screen-step2')">🌐 Настройки геолокации и рекомендаций</button>
+            <button class="btn btn-secondary" style="color: var(--danger); border-color: var(--danger);" onclick="exitSearch()">🚪 Выйти из поиска / Сменить аккаунт</button>
+        </div>
+    </div>
+
+    <!-- МЕНЮ НАВИГАЦИИ -->
+    <div id="bottom-nav" class="bottom-nav">
+        <button class="nav-item active" id="nav-btn-swipe" onclick="switchNavTab('screen-swipe')"><span class="icon">🔍</span><span>Поиск</span></button>
+        <button class="nav-item" id="nav-btn-preference" onclick="switchNavTab('screen-preference')"><span class="icon">⚙️</span><span>Типаж</span></button>
+        <button class="nav-item" id="nav-btn-chats" onclick="switchNavTab('screen-chats-list')">
+            <span class="nav-badge" id="chats-total-badge">0</span>
+            <span class="icon">💬</span><span>Чаты</span>
+        </button>
+        <button class="nav-item" id="nav-btn-profile" onclick="switchNavTab('screen-profile')"><span class="icon">👤</span><span>Профиль</span></button>
+    </div>
+
+    <!-- МОДАЛКА ВСТРЕЧИ НА КАРТЕ -->
+    <div id="map-modal" class="map-modal">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <h3 style="font-size: 1rem;">Выберите место на Google Картах</h3>
+            <button class="btn btn-secondary" style="padding: 4px 8px; font-size: 0.8rem;" onclick="closeMapModal()">Закрыть</button>
+        </div>
+        <div id="map"></div>
+        <div style="display: flex; gap: 8px; margin-bottom: 10px;">
+            <button class="btn btn-secondary" style="flex:1; margin:0; padding: 8px; font-size: 0.8rem;" onclick="locateUserGPS()">📍 Моя геопозиция</button>
+        </div>
+        <div class="form-group" style="margin-bottom: 10px;">
+            <label>Предлагаемое время</label>
+            <input type="time" id="meet-time" value="19:00">
+        </div>
+        <button class="btn" style="margin-top: 0;" onclick="sendLocationToChat()">Отправить локацию в чат</button>
+    </div>
+
+    <!-- МОДАЛКА ПРОФИЛЯ ПАРТНЕРА -->
+    <div id="partner-modal" class="modal-overlay">
+        <div class="modal-card">
+            <img id="modal-partner-avatar" style="width: 100%; height: 180px; object-fit: cover; border-radius: 12px;" src="" alt="">
+            <h3 id="modal-partner-name"></h3>
+            <p id="modal-partner-details" style="font-size: 0.85rem; color: var(--text-sub); line-height: 1.4;"></p>
+            <button class="btn btn-secondary" onclick="closePartnerModal()">Закрыть</button>
+        </div>
+    </div>
+
+    <!-- МОДАЛКА ЧЕРНОГО СПИСКА -->
+    <div id="blacklist-modal" class="modal-overlay">
+        <div class="modal-card">
+            <h3>Черный список</h3>
+            <div id="blacklist-items" style="display: flex; flex-direction: column; gap: 8px;"></div>
+            <button class="btn btn-secondary" onclick="closeBlacklistModal()">Закрыть</button>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    function acceptDisclaimer() {
+        localStorage.setItem('app_disclaimer_accepted', 'true');
+        document.getElementById('disclaimer-modal').style.display = 'none';
+    }
+
+    function declineDisclaimer() { window.location.href = "about:blank"; }
+
+    const dbGeo = {
+        sng: {
+            "Узбекистан": ["Ташкент", "Самарканд", "Наманган", "Андижан", "Бухара", "Хива", "Фергана", "Нукус", "Карши", "Термез", "Ургенч", "Коканд", "Маргилан"],
+            "Россия": ["Москва", "Санкт-Петербург", "Новосибирск", "Екатеринбург", "Казань", "Нижний Новгород", "Челябинск", "Краснодар", "Сочи", "Владивосток", "Уфа", "Ростов-на-Дону", "Самара", "Омск", "Воронеж", "Пермь", "Волгоград"],
+            "Казахстан": ["Алматы", "Астана", "Шымкент", "Актобе", "Караганда", "Атырау", "Павлодар", "Усть-Каменогорск", "Семей"],
+            "Беларусь": ["Минск", "Гомель", "Могилев", "Витебск", "Гродно", "Брест"],
+            "Армения": ["Ереван", "Гюмри", "Ванадзор"],
+            "Кыргызстан": ["Бишкек", "Ош", "Джалал-Абад", "Каракол"],
+            "Таджикистан": ["Душанбе", "Худжанд", "Бохтар"],
+            "Азербайджан": ["Баку", "Гянджа", "Сумгаит"],
+            "Молдова": ["Кишинёв", "Бельцы", "Тирасполь"]
+        },
+        europe: {
+            "Германия": ["Берлин", "Мюнхен", "Франкфурт", "Гамбург", "Кёльн", "Штутгарт", "Дюссельдорф"],
+            "Франция": ["Париж", "Марсель", "Лион", "Ницца", "Тулуза", "Бордо", "Страсбург"],
+            "Италия": ["Рим", "Милан", "Венеция", "Флоренция", "Неаполь", "Турин", "Болонья"],
+            "Испания": ["Мадрид", "Барселона", "Валенсия", "Севилья", "Малага", "Сарагоса"],
+            "Великобритания": ["Лондон", "Манчестер", "Бирмингем", "Эдинбург", "Глазго", "Ливерпуль"],
+            "Польша": ["Варшава", "Краков", "Вроцлав", "Гданьск", "Познань", "Лодзь"],
+            "Чехия": ["Прага", "Брно", "Острава"],
+            "Нидерланды": ["Амстердам", "Роттердам", "Гаага", "Утрехт"],
+            "Австрия": ["Вена", "Зальцбург", "Инсбрук"],
+            "Швейцария": ["Цюрих", "Женева", "Базель", "Берн"]
+        },
+        west: {
+            "США": ["Нью-Йорк", "Лос-Анджелес", "Чикаго", "Майами", "Сан-Франциско", "Сиэтл", "Вашингтон", "Хьюстон", "Даллас", "Бостон", "Лас-Вегас"],
+            "Канада": ["Торонто", "Ванкувер", "Монреаль", "Калгари", "Оттава"],
+            "Австралия": ["Сидней", "Мельбурн", "Брисбен", "Перт"],
+            "Бразилия": ["Сан-Паулу", "Рио-де-Жанейро", "Бразилиа"],
+            "Аргентина": ["Буэнос-Айрес", "Кордова"]
+        },
+        asia: {
+            "ОАЭ": ["Дубай", "Абу-Даби", "Шарджа", "Аджман"],
+            "Турция": ["Стамбул", "Анкара", "Анталья", "Измир", "Бурса", "Бодрум"],
+            "Китай": ["Пекин", "Шанхай", "Гуанчжоу", "Шэньчжэнь", "Чэнду"],
+            "Япония": ["Токио", "Осака", "Киото", "Йокогама"],
+            "Южная Корея": ["Сеул", "Пусан", "Инчхон"],
+            "Таиланд": ["Бангкок", "Пхукет", "Патайя", "Чиангмай"],
+            "Вьетнам": ["Ханой", "Хошимин", "Дананг"],
+            "Индия": ["Нью-Дели", "Мумбаи", "Бангалор"],
+            "Грузия": ["Тбилиси", "Батуми", "Кутаиси"]
+        }
+    };
+
+    let userData = JSON.parse(localStorage.getItem('app_user_data') || '{}');
+    let targetTypeData = JSON.parse(localStorage.getItem('app_target_type_data') || '{}');
+    let acceptedChats = JSON.parse(localStorage.getItem('app_accepted_chats') || '[]');
+    let blockedUsers = JSON.parse(localStorage.getItem('app_blocked_users') || '[]');
+    let selectedFilesToUpload = [];
+    let filteredProfiles = [];
+    let currentProfileIndex = 0;
+    let currentPhotoIndex = 0;
+    let activePartner = null;
+    let allLoadedUsersMap = {};
+
+    let googleMap = null;
+    let googleMarker = null;
+    let selectedCoords = null;
+    let isGeoEnabled = false;
+    let toastTimeout = null;
+
+    // Встроена сжатая обработка медиафайлов
+    function compressImage(file, maxWidth = 500, quality = 0.7) {
+        return new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = (event) => {
+                const img = new Image();
+                img.src = event.target.result;
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    const scaleSize = maxWidth / img.width;
+                    canvas.width = (img.width > maxWidth) ? maxWidth : img.width;
+                    canvas.height = (img.width > maxWidth) ? (img.height * scaleSize) : img.height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                    resolve(canvas.toDataURL('image/jpeg', quality));
+                };
+            };
+        });
+    }
+
+    async function handleProfilePhotosUpload(event) {
+        const files = Array.from(event.target.files);
+        if (!files.length) return;
+
+        selectedFilesToUpload = files;
+        const previewContainer = document.getElementById('profile-photos-preview');
+        previewContainer.innerHTML = '';
+
+        for (let file of files) {
+            const compressedUrl = await compressImage(file, 200, 0.5);
+            const img = document.createElement('img');
+            img.className = 'preview-thumb';
+            img.src = compressedUrl;
+            previewContainer.appendChild(img);
+        }
+    }
+
+    function showToast(sender, text) {
+        const banner = document.getElementById('toast-banner');
+        document.getElementById('toast-title').textContent = `Вам написал(а) ${sender}`;
+        document.getElementById('toast-body').textContent = text.replace(/<[^>]*>/g, '');
+        banner.onclick = () => { switchNavTab('screen-chats-list'); banner.classList.remove('show'); };
+        banner.classList.add('show');
+        if (toastTimeout) clearTimeout(toastTimeout);
+        toastTimeout = setTimeout(() => banner.classList.remove('show'), 4000);
+    }
+
+    function escapeHtml(str) {
+        return String(str || '').replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+    }
+
+    function saveData() {
+        localStorage.setItem('app_user_data', JSON.stringify(userData));
+        localStorage.setItem('app_target_type_data', JSON.stringify(targetTypeData));
+        localStorage.setItem('app_accepted_chats', JSON.stringify(acceptedChats));
+        localStorage.setItem('app_blocked_users', JSON.stringify(blockedUsers));
+    }
+
+    function goToStep2(e) {
+        e.preventDefault();
+        userData.name = document.getElementById('reg-name').value.trim();
+        userData.age = Number(document.getElementById('reg-age').value);
+        userData.hobbies = document.getElementById('reg-hobbies').value;
+        userData.job = document.getElementById('reg-job').value;
+        userData.topics = document.getElementById('reg-topics').value;
+        userData.gender = document.getElementById('reg-gender').value;
+        userData.height = Number(document.getElementById('reg-height').value) || null;
+        userData.weight = Number(document.getElementById('reg-weight').value) || null;
+        saveData();
+        showScreen('screen-step2');
+    }
+
+    function toggleGeoMode() {
+        isGeoEnabled = document.getElementById('geo-toggle-switch').checked;
+        const statusText = document.getElementById('geo-status-text');
+        const regionGroup = document.getElementById('manual-region-group');
+        const countryGroup = document.getElementById('manual-country-group');
+        const cityGroup = document.getElementById('manual-city-group');
+
+        if (!isGeoEnabled) {
+            statusText.textContent = "Выключена (ручной ввод)";
+            regionGroup.style.display = "flex"; countryGroup.style.display = "flex"; cityGroup.style.display = "flex";
+        } else {
+            statusText.textContent = "Включена (автоопределение)";
+            regionGroup.style.display = "none"; countryGroup.style.display = "none"; cityGroup.style.display = "none";
+        }
+    }
+
+    function onRegionChange() {
+        const region = document.getElementById('geo-region').value;
+        const countrySelect = document.getElementById('geo-country');
+        const cityInput = document.getElementById('geo-city');
+        const datalist = document.getElementById('cities-list');
+
+        countrySelect.innerHTML = '<option value="" disabled selected hidden>Выберите страну</option>';
+        datalist.innerHTML = ''; cityInput.value = ''; cityInput.disabled = true;
+
+        if (!region || !dbGeo[region]) return;
+        for (let country in dbGeo[region]) {
+            const opt = document.createElement('option');
+            opt.value = country; opt.textContent = country;
+            countrySelect.appendChild(opt);
+        }
+        countrySelect.disabled = false;
+    }
+
+    function onCountryChange() {
+        const region = document.getElementById('geo-region').value;
+        const country = document.getElementById('geo-country').value;
+        const cityInput = document.getElementById('geo-city');
+        const datalist = document.getElementById('cities-list');
+
+        datalist.innerHTML = ''; cityInput.value = '';
+        if (!region || !country || !dbGeo[region][country]) return;
+        dbGeo[region][country].forEach(city => {
+            const opt = document.createElement('option');
+            opt.value = city; datalist.appendChild(opt);
+        });
+        cityInput.disabled = false;
+    }
+
+    function toggleTypeFields() {
+        const val = document.getElementById('recommendation-preference').value;
+        document.getElementById('inline-type-box').style.display = (val === 'strict-type') ? 'flex' : 'none';
+    }
+
+    function syncTypeFieldsToTab() {
+        if (!targetTypeData) return;
+        document.getElementById('pref-height-min').value = targetTypeData.heightMin || '';
+        document.getElementById('pref-height-max').value = targetTypeData.heightMax || '';
+        document.getElementById('pref-weight-min').value = targetTypeData.weightMin || '';
+        document.getElementById('pref-weight-max').value = targetTypeData.weightMax || '';
+        document.getElementById('pref-job').value = targetTypeData.job || '';
+        document.getElementById('pref-hair').value = targetTypeData.hair || '';
+    }
+
+    async function initSearchScreen() {
+        document.getElementById('user-location-tag').textContent = `📍 ${userData.city || 'Город'}`;
+
+        let allProfiles = [];
+        if (window.loadProfilesFromFirebase) {
+            allProfiles = await window.loadProfilesFromFirebase();
+        }
+
+        allLoadedUsersMap = {};
+        allProfiles.forEach(p => { if (p.name) allLoadedUsersMap[p.name] = p; });
+
+        filteredProfiles = allProfiles.filter(p => !blockedUsers.includes(p.name));
+
+        currentProfileIndex = 0;
+        currentPhotoIndex = 0;
+        updateProfileInfoView();
+        renderSwipeCard();
+
+        document.getElementById('bottom-nav').classList.add('active');
+        showScreen('screen-swipe');
+        setActiveNav('nav-btn-swipe');
+    }
+
+    function saveTargetType(e) {
+        e.preventDefault();
+        targetTypeData = {
+            heightMin: document.getElementById('pref-height-min').value,
+            heightMax: document.getElementById('pref-height-max').value,
+            weightMin: document.getElementById('pref-weight-min').value,
+            weightMax: document.getElementById('pref-weight-max').value,
+            job: document.getElementById('pref-job').value,
+            hair: document.getElementById('pref-hair').value
+        };
+        userData.recommendationPref = 'strict-type';
+        document.getElementById('recommendation-preference').value = 'strict-type';
+        saveData();
+        initSearchScreen();
+    }
+
+    function updateProfileInfoView() {
+        const profileBlock = document.getElementById('profile-info-block');
+        profileBlock.innerHTML = `
+            <div style="text-align:center; margin-bottom: 10px;"><img class="avatar-img" style="width:80px; height:80px;" src="${escapeHtml(userData.photo)}"></div>
+            <div><b>ФИО:</b> ${escapeHtml(userData.name)}</div>
+            <div><b>Возраст:</b> ${escapeHtml(userData.age)}</div>
+            <div><b>Пол:</b> ${escapeHtml(userData.gender)}</div>
+            <div><b>Геолокация:</b> ${isGeoEnabled ? '🟢 Включена' : '🔴 Выключена'} (${escapeHtml(userData.city)})</div>
+            <div><b>Род деятельности:</b> ${escapeHtml(userData.job)}</div>
+            <div><b>Увлечения:</b> ${escapeHtml(userData.hobbies)}</div>
+        `;
+    }
+
+    function exitSearch() {
+        userData.isRegistered = false;
+        saveData();
+        document.getElementById('bottom-nav').classList.remove('active');
+        showScreen('screen-step1');
+    }
+
+    function switchNavTab(screenId) {
+        showScreen(screenId);
+        if (screenId === 'screen-swipe') setActiveNav('nav-btn-swipe');
+        if (screenId === 'screen-preference') setActiveNav('nav-btn-preference');
+        if (screenId === 'screen-chats-list') { setActiveNav('nav-btn-chats'); clearUnreadBadge(); }
+        if (screenId === 'screen-profile') setActiveNav('nav-btn-profile');
+    }
+
+    function clearUnreadBadge() {
+        const badge = document.getElementById('chats-total-badge');
+        badge.textContent = '0';
+        badge.style.display = 'none';
+    }
+
+    function setActiveNav(btnId) {
+        document.querySelectorAll('.nav-item').forEach(btn => btn.classList.remove('active'));
+        const activeBtn = document.getElementById(btnId);
+        if (activeBtn) activeBtn.classList.add('active');
+    }
+
+    function renderSwipeCard() {
+        const container = document.getElementById('card-container');
+        const actions = document.getElementById('swipe-actions');
+
+        while (currentProfileIndex < filteredProfiles.length && blockedUsers.includes(filteredProfiles[currentProfileIndex].name)) {
+            currentProfileIndex++;
+        }
+
+        if (!filteredProfiles || filteredProfiles.length === 0 || currentProfileIndex >= filteredProfiles.length) {
+            container.innerHTML = `
+                <div class="profile-card" style="justify-content: center; align-items: center; text-align: center; padding: 20px;">
+                    <h3>Анкеты закончились 🎉</h3>
+                    <p style="color: var(--text-sub); font-size: 0.9rem; margin-top: 6px;">В вашем регионе пока нет других анкет.</p>
+                </div>
+            `;
+            actions.style.display = "none";
+            return;
+        }
+
+        actions.style.display = "flex";
+        const current = filteredProfiles[currentProfileIndex];
+        const photos = (current.photos && current.photos.length) ? current.photos : [current.photo || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=600'];
+
+        if (currentPhotoIndex >= photos.length) currentPhotoIndex = 0;
+
+        const storyBars = photos.map((_, idx) => `<div class="photo-story-bar ${idx === currentPhotoIndex ? 'active' : ''}"></div>`).join('');
+
+        container.innerHTML = `
+            <div class="profile-card">
+                <div class="profile-card-image" style="background-image: url('${photos[currentPhotoIndex]}');" onclick="handleCardPhotoClick(event, ${photos.length})">
+                    <div class="photo-story-bars">${storyBars}</div>
+                    <div class="profile-card-image-overlay">
+                        <h2 style="color: #fff;">${escapeHtml(current.name)}, ${escapeHtml(current.age)}</h2>
+                        <span style="color: var(--text-sub); font-size: 0.85rem;">📍 ${escapeHtml(current.city || 'Город')}</span>
+                    </div>
+                </div>
+                <div class="profile-card-body">
+                    <div class="badge-grid">
+                        <span class="badge badge-accent">💼 ${escapeHtml(current.job)}</span>
+                        ${current.goal ? `<span class="badge badge-accent">${escapeHtml(current.goal)}</span>` : ''}
+                    </div>
+                    <div><label>Увлечения</label><p>${escapeHtml(current.hobbies)}</p></div>
+                    <div><label>Быстрые темы</label><p>${escapeHtml(current.topics)}</p></div>
+                </div>
+            </div>
+        `;
+    }
+
+    function handleCardPhotoClick(event, totalPhotos) {
+        const rect = event.currentTarget.getBoundingClientRect();
+        const clickX = event.clientX - rect.left;
+        if (clickX > rect.width / 2) {
+            currentPhotoIndex = (currentPhotoIndex + 1) % totalPhotos;
+        } else {
+            currentPhotoIndex = (currentPhotoIndex - 1 + totalPhotos) % totalPhotos;
+        }
+        renderSwipeCard();
+    }
+
+    function handleSwipe(isLike) {
+        const current = filteredProfiles[currentProfileIndex];
+        if (isLike && current) {
+            if (!acceptedChats.includes(current.name)) { acceptedChats.push(current.name); saveData(); }
+            if (window.openChat) window.openChat(current.name);
+        } else {
+            currentProfileIndex++;
+            currentPhotoIndex = 0;
+            renderSwipeCard();
+        }
+    }
+
+    function reportOrBlockCurrentProfile() {
+        const current = filteredProfiles[currentProfileIndex];
+        if (!current) return;
+        blockedUsers.push(current.name);
+        saveData();
+        currentProfileIndex++;
+        currentPhotoIndex = 0;
+        renderSwipeCard();
+    }
+
+    function acceptChatRequest(partnerName) {
+        if (!partnerName) return;
+        if (!acceptedChats.includes(partnerName)) { acceptedChats.push(partnerName); saveData(); }
+        if (window.openChat) window.openChat(partnerName);
+    }
+
+    function ignoreChatRequest(partnerName) {
+        if (!partnerName) return;
+        if (!blockedUsers.includes(partnerName)) { blockedUsers.push(partnerName); saveData(); }
+        showScreen('screen-chats-list');
+    }
+
+    function blockChatPartner() {
+        if (!activePartner) return;
+        ignoreChatRequest(activePartner);
+    }
+
+    function openPartnerProfileModal() {
+        const partner = allLoadedUsersMap[activePartner] || {};
+        const avatarUrl = partner.photo || document.getElementById('chat-partner-avatar').src;
+        document.getElementById('modal-partner-avatar').src = avatarUrl;
+        document.getElementById('modal-partner-name').textContent = activePartner;
+        document.getElementById('modal-partner-details').innerHTML = `
+            <b>Возраст:</b> ${partner.age || 'Не указан'}<br>
+            <b>Город:</b> ${partner.city || 'Не указан'}<br>
+            <b>Деятельность:</b> ${partner.job || 'Не указан'}<br>
+            <b>Увлечения:</b> ${partner.hobbies || 'Не указаны'}
+        `;
+        document.getElementById('partner-modal').classList.add('active');
+    }
+
+    function closePartnerModal() { document.getElementById('partner-modal').classList.remove('active'); }
+
+    function openBlacklistModal() {
+        const container = document.getElementById('blacklist-items');
+        container.innerHTML = '';
+        if (blockedUsers.length === 0) {
+            container.innerHTML = '<p style="font-size:0.85rem; color:var(--text-sub);">Черный список пуст.</p>';
+        } else {
+            blockedUsers.forEach(name => {
+                const item = document.createElement('div');
+                item.style.cssText = 'display:flex; justify-content:space-between; align-items:center; padding:6px 0; border-bottom:1px solid var(--border-color);';
+                item.innerHTML = `
+                    <span>${escapeHtml(name)}</span>
+                    <button class="btn" style="padding:4px 8px; font-size:0.75rem;" onclick="unblockUser('${escapeHtml(name)}')">Разблокировать</button>
+                `;
+                container.appendChild(item);
+            });
+        }
+        document.getElementById('blacklist-modal').classList.add('active');
+    }
+
+    function unblockUser(name) {
+        blockedUsers = blockedUsers.filter(u => u !== name);
+        saveData();
+        openBlacklistModal();
+        if (window.listenUserChats) window.listenUserChats();
+    }
+
+    function closeBlacklistModal() { document.getElementById('blacklist-modal').classList.remove('active'); }
+
+    function triggerMediaUpload() { document.getElementById('media-file-input').click(); }
+
+    async function handleFileSelected(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        const compressedBase64 = await compressImage(file, 600, 0.6);
+        window.sendChatMessage(`<img src="${compressedBase64}" style="max-width:100%; border-radius:8px;">`, true);
+    }
+
+    function openMapModal() {
+        document.getElementById('map-modal').classList.add('active');
+        if (typeof google === 'undefined' || !google.maps) {
+            document.getElementById('map').innerHTML = '<div style="padding:20px; text-align:center; color: var(--text-sub);">Карта недоступна.</div>';
+            return;
+        }
+        setTimeout(() => {
+            if (!googleMap) {
+                googleMap = new google.maps.Map(document.getElementById('map'), { zoom: 12, center: { lat: 41.311081, lng: 69.240562 } });
+                googleMap.addListener('click', (e) => setGoogleMarker(e.latLng));
+            }
+        }, 200);
+    }
+
+    function setGoogleMarker(latLng) {
+        selectedCoords = { lat: latLng.lat(), lng: latLng.lng() };
+        if (googleMarker) googleMarker.setPosition(latLng);
+        else googleMarker = new google.maps.Marker({ position: latLng, map: googleMap });
+    }
+
+    function locateUserGPS() {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(pos => {
+                const p = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+                if (googleMap) { googleMap.setCenter(p); setGoogleMarker(new google.maps.LatLng(p.lat, p.lng)); }
+            });
+        }
+    }
+
+    function sendLocationToChat() {
+        const time = document.getElementById('meet-time').value;
+        if (!selectedCoords) return alert("Выберите место на карте!");
+        const mapUrl = `https://maps.google.com/?q=${selectedCoords.lat},${selectedCoords.lng}`;
+        window.sendChatMessage(`📍 <b>Встреча:</b> ${escapeHtml(time)}<br><a href="${mapUrl}" target="_blank" style="color: #60a5fa;">Карта</a>`, true);
+        closeMapModal();
+    }
+
+    function closeMapModal() { document.getElementById('map-modal').classList.remove('active'); }
+
+    function showScreen(screenId) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById(screenId).classList.add('active');
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+        if (localStorage.getItem('app_disclaimer_accepted') === 'true') {
+            document.getElementById('disclaimer-modal').style.display = 'none';
+        }
+        syncTypeFieldsToTab();
+        if (userData.isRegistered) initSearchScreen();
+    });
+</script>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-app.js";
+  import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-analytics.js";
+  import { getFirestore, collection, addDoc, getDocs, query, where, limit, onSnapshot, doc, updateDoc } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyCFl9_bOVzbtZwNPOxaNJb3BfW2XB0Jpgg",
+    authDomain: "dating-uz.firebaseapp.com",
+    projectId: "dating-uz",
+    storageBucket: "dating-uz.firebasestorage.app",
+    messagingSenderId: "1046578611265",
+    appId: "1:1046578611265:web:97597ee1a45dc4d192f2c0",
+    measurementId: "G-NM2EGJH6DV"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const analytics = getAnalytics(app);
+  const db = getFirestore(app);
+
+  let unsubscribeChat = null;
+  let unsubscribeChatsList = null;
+  let isInitialLoad = true;
+
+  window.completeRegistration = async function(e) {
+    if (e) e.preventDefault();
+    const submitBtn = document.getElementById('reg-submit-btn');
+    submitBtn.textContent = "Сохранение..."; submitBtn.disabled = true;
+
+    if (isGeoEnabled) { userData.country = "Узбекистан"; userData.city = "Ташкент (GPS)"; }
+    else { userData.country = document.getElementById('geo-country').value || "Не указана"; userData.city = document.getElementById('geo-city').value || "Не указан"; }
+
+    userData.recommendationPref = document.getElementById('recommendation-preference').value;
+    
+    try {
+      let compressedPhotos = [];
+      if (selectedFilesToUpload.length > 0) {
+        for (let file of selectedFilesToUpload) {
+          const base64 = await compressImage(file, 480, 0.6);
+          compressedPhotos.push(base64);
+        }
+      }
+
+      userData.photos = compressedPhotos.length ? compressedPhotos : ["https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=600"];
+      userData.photo = userData.photos[0];
+      userData.isRegistered = true;
+
+      saveData();
+      await addDoc(collection(db, "users"), userData);
+      initSearchScreen();
+    } catch (err) {
+      alert("Ошибка записи в базу: " + err.message);
+    } finally {
+      submitBtn.textContent = "Сохранить и поискать"; submitBtn.disabled = false;
+    }
+  };
+
+  window.loadProfilesFromFirebase = async function() {
+    try {
+      const targetGender = (userData.gender === "Мужчина") ? "Женщина" : "Мужчина";
+      const q = query(
+        collection(db, "users"), 
+        where("gender", "==", targetGender),
+        limit(20)
+      );
+      const querySnapshot = await getDocs(q);
+      const profiles = [];
+      querySnapshot.forEach((doc) => profiles.push(doc.data()));
+      return profiles;
+    } catch (e) { return []; }
+  };
+
+  window.sendChatMessage = async function(customText, isHtml = false) {
+    const input = document.getElementById('chat-input-field');
+    const text = customText || input.value.trim();
+    if (!text) return;
+
+    const partnerName = document.getElementById('chat-partner-name').textContent;
+
+    if (blockedUsers.includes(partnerName)) {
+        return;
+    }
+
+    if (!customText) input.value = '';
+
+    try {
+      await addDoc(collection(db, "messages"), {
+        sender: userData.name,
+        receiver: partnerName,
+        text: text,
+        isHtml: isHtml,
+        timestamp: Date.now(),
+        isRead: false
+      });
+    } catch (err) { console.error(err); }
+  };
+
+  window.sendMessage = function() { window.sendChatMessage(); };
+
+  window.openChat = function(partnerName) {
+    activePartner = partnerName;
+    document.getElementById('chat-partner-name').textContent = partnerName;
+    
+    const partnerData = allLoadedUsersMap[partnerName] || {};
+    const avatarUrl = partnerData.photo || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200";
+    document.getElementById('chat-partner-avatar').src = avatarUrl;
+
+    const msgContainer = document.getElementById('chat-messages');
+    const requestBanner = document.getElementById('chat-request-banner');
+    const inputBox = document.getElementById('chat-input-box');
+    const inputField = document.getElementById('chat-input-field');
+    
+    msgContainer.innerHTML = '';
+    showScreen('screen-chat');
+
+    const isAccepted = acceptedChats.includes(partnerName);
+    const isBlocked = blockedUsers.includes(partnerName);
+
+    if (isBlocked) {
+        requestBanner.style.display = 'none';
+        inputBox.style.opacity = '0.3';
+        inputBox.style.pointerEvents = 'none';
+        inputField.placeholder = "Пользователь заблокирован";
+    } else if (!isAccepted) {
+        requestBanner.style.display = 'block';
+        inputBox.style.opacity = '0.4';
+        inputBox.style.pointerEvents = 'none';
+        inputField.placeholder = "Примите запрос для общения...";
+    } else {
+        requestBanner.style.display = 'none';
+        inputBox.style.opacity = '1';
+        inputBox.style.pointerEvents = 'auto';
+        inputField.placeholder = "Напишите сообщение...";
+    }
+
+    if (unsubscribeChat) unsubscribeChat();
+
+    const q = query(collection(db, "messages"));
+
+    unsubscribeChat = onSnapshot(q, (snapshot) => {
+      msgContainer.innerHTML = '';
+      let msgs = [];
+
+      snapshot.forEach((docSnap) => {
+        const msg = docSnap.data();
+        if (
+          (msg.sender === userData.name && msg.receiver === partnerName) ||
+          (msg.sender === partnerName && msg.receiver === userData.name)
+        ) {
+          msgs.push(msg);
+          if (msg.receiver === userData.name && !msg.isRead) {
+            updateDoc(doc(db, "messages", docSnap.id), { isRead: true }).catch(e => console.error(e));
+          }
+        }
+      });
+
+      msgs.sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
+
+      msgs.forEach(msg => {
+        const msgDiv = document.createElement('div');
+        const isUserMsg = msg.sender === userData.name;
+        msgDiv.className = `message ${isUserMsg ? 'user' : 'match'}`;
+
+        if (!isUserMsg && !isAccepted) {
+          msgDiv.classList.add('blur-text');
+          msgDiv.textContent = 'Сообщение скрыто. Нажмите "Принять", чтобы открыть.';
+        } else {
+          if (msg.isHtml) msgDiv.innerHTML = msg.text;
+          else msgDiv.textContent = msg.text;
+        }
+        msgContainer.appendChild(msgDiv);
+      });
+
+      msgContainer.scrollTop = msgContainer.scrollHeight;
+    });
+  };
+
+  window.listenUserChats = function() {
+    const container = document.getElementById('chats-container');
+    const badge = document.getElementById('chats-total-badge');
+    const q = query(collection(db, "messages"));
+
+    if (unsubscribeChatsList) unsubscribeChatsList();
+
+    unsubscribeChatsList = onSnapshot(q, (snapshot) => {
+      const conversations = {};
+      let totalUnreadCount = 0;
+
+      snapshot.docChanges().forEach((change) => {
+        if (change.type === "added" && !isInitialLoad) {
+          const newMsg = change.doc.data();
+          if (newMsg.receiver === userData.name && newMsg.sender !== activePartner && !blockedUsers.includes(newMsg.sender)) {
+            showToast(newMsg.sender, newMsg.text);
+          }
+        }
+      });
+
+      snapshot.forEach((doc) => {
+        const msg = doc.data();
+        let partner = null;
+
+        if (msg.sender === userData.name) partner = msg.receiver;
+        else if (msg.receiver === userData.name) partner = msg.sender;
+
+        if (partner && !blockedUsers.includes(partner)) {
+          if (!conversations[partner]) conversations[partner] = [];
+          conversations[partner].push(msg);
+
+          if (msg.receiver === userData.name && msg.isRead === false) {
+            totalUnreadCount++;
+          }
+        }
+      });
+
+      isInitialLoad = false;
+
+      if (totalUnreadCount > 0) {
+        badge.textContent = totalUnreadCount;
+        badge.style.display = 'block';
+      } else {
+        badge.style.display = 'none';
+      }
+
+      const partners = Object.keys(conversations);
+
+      if (partners.length === 0) {
+        container.innerHTML = `<p style="color: var(--text-sub); font-size: 0.9rem; text-align: center; margin-top: 40px;">Здесь появятся ваши диалоги.</p>`;
+        return;
+      }
+
+      container.innerHTML = '';
+
+      partners.forEach(partner => {
+        const isAccepted = acceptedChats.includes(partner);
+        const msgs = conversations[partner];
+        const unreadMsgs = msgs.filter(m => m.receiver === userData.name && m.isRead === false);
+        const partnerData = allLoadedUsersMap[partner] || {};
+        const avatarUrl = partnerData.photo || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200";
+
+        const item = document.createElement('div');
+        item.className = 'chat-list-item';
+
+        if (isAccepted) {
+            msgs.sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
+            const lastMsg = msgs[msgs.length - 1];
+            const cleanText = (lastMsg.text || '').replace(/<[^>]*>/g, '');
+
+            item.innerHTML = `
+                <div class="chat-item-header" onclick="window.openChat('${escapeHtml(partner)}')" style="cursor: pointer;">
+                    <img class="avatar-img" src="${avatarUrl}" alt="Avatar">
+                    <div style="flex: 1;">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <h4 style="font-size: 0.95rem; color: #fff;">${escapeHtml(partner)}</h4>
+                            ${unreadMsgs.length > 0 ? `<span class="count-badge">${unreadMsgs.length}</span>` : ''}
+                        </div>
+                        <p style="font-size: 0.8rem; color: var(--text-sub); margin-top: 2px;">${escapeHtml(cleanText)}</p>
+                    </div>
+                </div>
+            `;
+        } else {
+            item.style.borderColor = 'var(--accent)';
+            item.innerHTML = `
+                <div class="chat-item-header">
+                    <img class="avatar-img" src="${avatarUrl}" alt="Avatar">
+                    <div style="flex: 1;">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <h4 style="font-size: 0.95rem; color: #fff;">Запрос от ${escapeHtml(partner)}</h4>
+                            ${unreadMsgs.length > 0 ? `<span class="count-badge">${unreadMsgs.length} сообщ.</span>` : ''}
+                        </div>
+                        <p style="font-size: 0.78rem; color: var(--text-sub); margin-top:2px;">Хочет начать общение</p>
+                    </div>
+                </div>
+                <div class="request-actions">
+                    <button class="btn btn-secondary" style="flex: 1; padding: 6px; font-size: 0.75rem; color: var(--danger); border-color: var(--danger);" onclick="ignoreChatRequest('${escapeHtml(partner)}')">Игнор / Блок</button>
+                    <button class="btn" style="flex: 1; padding: 6px; font-size: 0.75rem; margin:0;" onclick="acceptChatRequest('${escapeHtml(partner)}')">Принять</button>
+                </div>
+            `;
+        }
+        container.appendChild(item);
+      });
+    });
+  };
+
+  window.addEventListener('DOMContentLoaded', () => {
+    if (userData.name) {
+      window.listenUserChats();
+    }
+  });
+</script>
+</body>
+</html>
