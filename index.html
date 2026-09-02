@@ -147,12 +147,12 @@
 
         .chat-header { display: flex; align-items: center; justify-content: space-between; padding-bottom: 12px; border-bottom: 1px solid var(--border-color); margin-bottom: 12px; gap: 6px; }
         .chat-messages { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; scroll-behavior: smooth; }
-        .message { max-width: 85%; padding: 10px 14px; border-radius: 16px; font-size: 0.88rem; line-height: 1.35; word-break: break-word; }
+        .message { max-width: 85%; padding: 10px 14px; border-radius: 16px; font-size: 0.88rem; line-height: 1.35; word-break: break-word; user-select: none; }
         .message.user { background-color: var(--user-msg); align-self: flex-end; }
         .message.match { background-color: var(--match-msg); align-self: flex-start; }
 
         .blur-text { filter: blur(4px); user-select: none; }
-        .chat-input { display: flex; gap: 8px; margin-top: 10px; align-items: center; }
+        .chat-input { display: flex; gap: 6px; margin-top: 10px; align-items: center; }
         .chat-list-item { display: flex; flex-direction: column; gap: 10px; padding: 12px; background: var(--input-bg); border-radius: 14px; border: 1px solid var(--border-color); margin-bottom: 8px; }
         .chat-item-header { display: flex; align-items: center; gap: 12px; }
         .count-badge { background: var(--danger); color: #fff; font-size: 0.72rem; font-weight: bold; padding: 2px 7px; border-radius: 10px; }
@@ -219,7 +219,7 @@
         </div>
 
         <form style="display: flex; flex-direction: column; flex: 1;" onsubmit="goToStep2(event)">
-            <div class="form-group"><label>ФИО</label><input type="text" id="reg-name" placeholder="Иван Иванов" required></div>
+            <div class="form-group"><label>ФИО</label><input type="text" id="reg-name" placeholder="Иван Иванов" spellcheck="true" lang="ru" required></div>
             <div class="form-group"><label>ВОЗРАСТ</label><input type="number" id="reg-age" placeholder="25" required></div>
             
             <div class="form-group">
@@ -229,7 +229,7 @@
                 <div class="preview-thumbnails" id="profile-photos-preview"></div>
             </div>
 
-            <div class="form-group"><label>УВЛЕЧЕНИЯ</label><input type="text" id="reg-hobbies" placeholder="Спорт, авто, путешествия"></div>
+            <div class="form-group"><label>УВЛЕЧЕНИЯ</label><input type="text" id="reg-hobbies" placeholder="Спорт, авто, путешествия" spellcheck="true" lang="ru"></div>
             <div class="form-group">
                 <label>РОД ДЕЯТЕЛЬНОСТИ</label>
                 <select id="reg-job" required>
@@ -248,7 +248,7 @@
                     <option value="Другое">Другое</option>
                 </select>
             </div>
-            <div class="form-group"><label>БЫСТРЫЕ ТЕМЫ ДЛЯ РАЗГОВОРА</label><textarea id="reg-topics" rows="2" style="resize: none;" placeholder="Кино, музыка, IT..."></textarea></div>
+            <div class="form-group"><label>БЫСТРЫЕ ТЕМЫ ДЛЯ РАЗГОВОРА</label><textarea id="reg-topics" rows="2" style="resize: none;" placeholder="Кино, музыка, IT..." spellcheck="true" lang="ru"></textarea></div>
             <div class="form-group">
                 <label>ЦЕЛЬ ЗНАКОМСТВА</label>
                 <div class="checkbox-group">
@@ -342,7 +342,7 @@
             </div>
             <div class="form-group" id="manual-city-group" style="display:flex;">
                 <label>Город *</label>
-                <input type="text" id="geo-city" list="cities-list" placeholder="Выберите или введите город..." disabled>
+                <input type="text" id="geo-city" list="cities-list" placeholder="Выберите или введите город..." spellcheck="true" lang="ru" disabled>
                 <datalist id="cities-list"></datalist>
             </div>
 
@@ -429,7 +429,10 @@
             <button class="btn btn-secondary" style="padding: 5px 8px; font-size: 0.75rem;" onclick="showScreen('screen-chats-list')">← Назад</button>
             <div style="display: flex; align-items: center; gap: 8px; cursor: pointer;" onclick="openPartnerProfileModal()">
                 <img id="chat-partner-avatar" class="avatar-small" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200" alt="avatar">
-                <h3 id="chat-partner-name" style="font-size: 0.95rem; text-decoration: underline; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100px;">Имя</h3>
+                <div style="display: flex; flex-direction: column;">
+                    <h3 id="chat-partner-name" style="font-size: 0.95rem; text-decoration: underline; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100px;">Имя</h3>
+                    <span id="chat-partner-status" style="font-size: 0.68rem; color: var(--text-sub);">оффлайн</span>
+                </div>
             </div>
             <button class="btn" style="padding: 5px 8px; font-size: 0.75rem; margin:0;" onclick="openMapModal()">📍 Место</button>
             <button class="btn btn-secondary" style="padding: 5px 8px; font-size: 0.72rem; color: var(--danger); border-color: var(--danger); margin:0;" onclick="blockChatPartner()">🚫 Блок</button>
@@ -445,10 +448,20 @@
 
         <div class="chat-messages" id="chat-messages"></div>
 
+        <!-- Превью ответа на сообщение -->
+        <div id="reply-preview-bar" style="display: none; background: var(--input-bg); padding: 6px 12px; border-left: 3px solid var(--accent); border-radius: 6px; font-size: 0.8rem; margin-top: 6px; justify-content: space-between; align-items: center;">
+            <div>
+                <span id="reply-to-author" style="color: var(--accent); font-weight: bold; display: block;"></span>
+                <span id="reply-to-text" style="color: var(--text-sub); overflow: hidden; white-space: nowrap; text-overflow: ellipsis; max-width: 250px; display: block;"></span>
+            </div>
+            <button onclick="cancelReply()" style="background: none; border: none; color: var(--text-sub); font-size: 1.1rem; cursor: pointer;">✖</button>
+        </div>
+
         <div class="chat-input" id="chat-input-box">
             <button class="btn btn-secondary" id="chat-file-btn" style="padding: 8px 10px; margin-top:0;" onclick="triggerMediaUpload()" title="Отправить фото/видео">📎</button>
-            <input type="file" id="media-file-input" accept="image/*" style="display: none;" onchange="handleFileSelected(event)">
-            <input type="text" id="chat-input-field" placeholder="Напишите сообщение..." onkeydown="if(event.key==='Enter') window.sendMessage()">
+            <button class="btn btn-secondary" id="voice-record-btn" style="padding: 8px 10px; margin-top:0;" onclick="toggleVoiceRecording()" title="Голосовое сообщение">🎙️</button>
+            <input type="file" id="media-file-input" accept="image/*,video/*" style="display: none;" onchange="handleFileSelected(event)">
+            <input type="text" id="chat-input-field" placeholder="Напишите сообщение..." spellcheck="true" lang="ru" onkeydown="if(event.key==='Enter') window.sendMessage()">
             <button class="btn" id="chat-send-btn" style="margin-top:0; padding: 10px 15px;" onclick="window.sendMessage()">➤</button>
         </div>
     </div>
@@ -511,6 +524,13 @@
             <h3>Черный список</h3>
             <div id="blacklist-items" style="display: flex; flex-direction: column; gap: 8px;"></div>
             <button class="btn btn-secondary" onclick="closeBlacklistModal()">Закрыть</button>
+        </div>
+    </div>
+
+    <!-- МОДАЛКА ПРОСМОТРА ФОТО/ВИДЕО ВО ВЕСЬ ЭКРАН -->
+    <div id="media-viewer-modal" class="modal-overlay" onclick="closeMediaViewer()">
+        <div style="max-width: 90vw; max-height: 90vh; display: flex; justify-content: center; align-items: center;">
+            <div id="media-viewer-content"></div>
         </div>
     </div>
 
@@ -585,7 +605,12 @@
     let isGeoEnabled = false;
     let toastTimeout = null;
 
-    // Встроена сжатая обработка медиафайлов
+    // ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ДЛЯ ГОЛОСОВЫХ И ОТВЕТОВ
+    let mediaRecorder = null;
+    let audioChunks = [];
+    let isRecording = false;
+    let currentReplyData = null;
+
     function compressImage(file, maxWidth = 500, quality = 0.7) {
         return new Promise((resolve) => {
             const reader = new FileReader();
@@ -948,9 +973,93 @@
     async function handleFileSelected(event) {
         const file = event.target.files[0];
         if (!file) return;
-        const compressedBase64 = await compressImage(file, 600, 0.6);
-        window.sendChatMessage(`<img src="${compressedBase64}" style="max-width:100%; border-radius:8px;">`, true);
+
+        if (file.type.startsWith('image/')) {
+            const compressedBase64 = await compressImage(file, 600, 0.6);
+            window.sendChatMessage(`<img src="${compressedBase64}" style="max-width:100%; border-radius:8px; cursor:pointer;">`, true);
+        } else if (file.type.startsWith('video/')) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                window.sendChatMessage(`<video src="${e.target.result}" controls style="max-width:100%; border-radius:8px; cursor:pointer;"></video>`, true);
+            };
+            reader.readAsDataURL(file);
+        }
     }
+
+    /* ФУНКЦИИ ГОЛОСОВЫХ СООБЩЕНИЙ */
+    async function toggleVoiceRecording() {
+        const btn = document.getElementById('voice-record-btn');
+        if (!isRecording) {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                mediaRecorder = new MediaRecorder(stream);
+                audioChunks = [];
+
+                mediaRecorder.ondataavailable = (e) => audioChunks.push(e.data);
+                mediaRecorder.onstop = async () => {
+                    const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                    const reader = new FileReader();
+                    reader.readAsDataURL(audioBlob);
+                    reader.onloadend = () => {
+                        const base64Audio = reader.result;
+                        const audioHtml = `<audio controls src="${base64Audio}" style="max-width: 200px; outline: none;"></audio>`;
+                        window.sendChatMessage(audioHtml, true);
+                    };
+                };
+
+                mediaRecorder.start();
+                isRecording = true;
+                btn.style.background = 'var(--danger)';
+                btn.textContent = '⏹️';
+            } catch (err) {
+                alert('Нет доступа к микрофону!');
+            }
+        } else {
+            mediaRecorder.stop();
+            mediaRecorder.stream.getTracks().forEach(track => track.stop());
+            isRecording = false;
+            btn.style.background = 'transparent';
+            btn.textContent = '🎙️';
+        }
+    }
+
+    /* ФУНКЦИИ ОТВЕТА НА СООБЩЕНИЕ */
+    function setReplyToMessage(sender, text) {
+        currentReplyData = { sender, text };
+        document.getElementById('reply-to-author').textContent = sender;
+        document.getElementById('reply-to-text').textContent = text.replace(/<[^>]*>/g, '');
+        document.getElementById('reply-preview-bar').style.display = 'flex';
+    }
+
+    function cancelReply() {
+        currentReplyData = null;
+        document.getElementById('reply-preview-bar').style.display = 'none';
+    }
+
+    /* ФУНКЦИИ ПОЛНОЭКРАННОГО ПРОСМОТРА ФОТО/ВИДЕО */
+    function openMediaViewer(src, type = 'image') {
+        const container = document.getElementById('media-viewer-content');
+        if (type === 'image') {
+            container.innerHTML = `<img src="${src}" style="max-width: 100%; max-height: 80vh; border-radius: 12px; object-fit: contain;">`;
+        } else if (type === 'video') {
+            container.innerHTML = `<video src="${src}" controls autoplay style="max-width: 100%; max-height: 80vh; border-radius: 12px;"></video>`;
+        }
+        document.getElementById('media-viewer-modal').classList.add('active');
+    }
+
+    function closeMediaViewer() {
+        document.getElementById('media-viewer-modal').classList.remove('active');
+        document.getElementById('media-viewer-content').innerHTML = '';
+    }
+
+    // Слушатель кликов по чату для модального просмотра медиа
+    document.getElementById('chat-messages').addEventListener('click', (e) => {
+        if (e.target.tagName === 'IMG' && !e.target.classList.contains('avatar-img') && !e.target.classList.contains('avatar-small')) {
+            openMediaViewer(e.target.src, 'image');
+        } else if (e.target.tagName === 'VIDEO') {
+            openMediaViewer(e.target.src, 'video');
+        }
+    });
 
     function openMapModal() {
         document.getElementById('map-modal').classList.add('active');
@@ -1028,6 +1137,34 @@
   let unsubscribeChatsList = null;
   let isInitialLoad = true;
 
+  // Функция автоматического онлайн-статуса
+  async function updateUserOnlineStatus() {
+      if (!userData.name) return;
+      try {
+          const q = query(collection(db, "users"), where("name", "==", userData.name), limit(1));
+          const snap = await getDocs(q);
+          snap.forEach(async (userDoc) => {
+              await updateDoc(doc(db, "users", userDoc.id), { lastSeen: Date.now() });
+          });
+      } catch(e) { console.error(e); }
+  }
+
+  setInterval(updateUserOnlineStatus, 30000);
+
+  function checkPartnerOnlineStatus(partnerName) {
+      const statusEl = document.getElementById('chat-partner-status');
+      const partnerData = allLoadedUsersMap[partnerName];
+      
+      if (partnerData && partnerData.lastSeen) {
+          const isOnline = (Date.now() - partnerData.lastSeen) < 60000;
+          statusEl.textContent = isOnline ? '🟢 онлайн' : '⚪ оффлайн';
+          statusEl.style.color = isOnline ? 'var(--success)' : 'var(--text-sub)';
+      } else {
+          statusEl.textContent = '⚪ оффлайн';
+          statusEl.style.color = 'var(--text-sub)';
+      }
+  }
+
   window.completeRegistration = async function(e) {
     if (e) e.preventDefault();
     const submitBtn = document.getElementById('reg-submit-btn');
@@ -1037,6 +1174,7 @@
     else { userData.country = document.getElementById('geo-country').value || "Не указана"; userData.city = document.getElementById('geo-city').value || "Не указан"; }
 
     userData.recommendationPref = document.getElementById('recommendation-preference').value;
+    userData.lastSeen = Date.now();
     
     try {
       let compressedPhotos = [];
@@ -1078,13 +1216,20 @@
 
   window.sendChatMessage = async function(customText, isHtml = false) {
     const input = document.getElementById('chat-input-field');
-    const text = customText || input.value.trim();
+    let text = customText || input.value.trim();
     if (!text) return;
 
     const partnerName = document.getElementById('chat-partner-name').textContent;
 
     if (blockedUsers.includes(partnerName)) {
         return;
+    }
+
+    if (currentReplyData) {
+        const replyQuote = `<div style="border-left: 2px solid #fff; padding-left: 6px; font-size: 0.75rem; opacity: 0.8; margin-bottom: 4px;"><b>${escapeHtml(currentReplyData.sender)}:</b> ${escapeHtml(currentReplyData.text.substring(0, 40))}...</div>`;
+        text = replyQuote + (isHtml ? text : escapeHtml(text));
+        isHtml = true;
+        cancelReply();
     }
 
     if (!customText) input.value = '';
@@ -1098,6 +1243,7 @@
         timestamp: Date.now(),
         isRead: false
       });
+      updateUserOnlineStatus();
     } catch (err) { console.error(err); }
   };
 
@@ -1107,6 +1253,8 @@
     activePartner = partnerName;
     document.getElementById('chat-partner-name').textContent = partnerName;
     
+    checkPartnerOnlineStatus(partnerName);
+
     const partnerData = allLoadedUsersMap[partnerName] || {};
     const avatarUrl = partnerData.photo || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200";
     document.getElementById('chat-partner-avatar').src = avatarUrl;
@@ -1166,6 +1314,7 @@
         const msgDiv = document.createElement('div');
         const isUserMsg = msg.sender === userData.name;
         msgDiv.className = `message ${isUserMsg ? 'user' : 'match'}`;
+        msgDiv.ondblclick = () => setReplyToMessage(msg.sender, msg.text);
 
         if (!isUserMsg && !isAccepted) {
           msgDiv.classList.add('blur-text');
@@ -1290,6 +1439,7 @@
   window.addEventListener('DOMContentLoaded', () => {
     if (userData.name) {
       window.listenUserChats();
+      updateUserOnlineStatus();
     }
   });
 </script>
