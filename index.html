@@ -989,8 +989,8 @@ let deckIndex = 0;
 function currentProfile() { return profiles[deckIndex % profiles.length]; }
 
 async function loadAndRenderDeck() {
-  if (window.loadProfilesFromFirebase) {
-    profiles = await window.loadProfilesFromFirebase();
+  if (window.loadProfilesFromSupabase) {
+    profiles = await window.loadProfilesFromSupabase();
   }
   renderDeck();
 }
@@ -1306,8 +1306,8 @@ function openChat(id) {
 
   if (activeChatUnsubscribe) activeChatUnsubscribe();
 
-  if (window.listenFirebaseChat) {
-    activeChatUnsubscribe = window.listenFirebaseChat(myProfile.name || 'Я', c.name, (newMessages) => {
+  if (window.listenSupabaseChat) {
+    activeChatUnsubscribe = window.listenSupabaseChat(myProfile.name || 'Я', c.name, (newMessages) => {
       c.messages = newMessages.map(m => ({
         dir: m.sender === (myProfile.name || 'Я') ? 'out' : 'in',
         type: m.type || 'text',
@@ -1331,8 +1331,8 @@ async function sendMessage() {
 
   chatInputEl.value = '';
   
-  if (window.sendFirebaseMessage) {
-    await window.sendFirebaseMessage(myProfile.name || 'Я', c.name, text, 'text');
+  if (window.sendSupabaseMessage) {
+    await window.sendSupabaseMessage(myProfile.name || 'Я', c.name, text, 'text');
   }
 }
 document.getElementById('sendBtnEl').addEventListener('click', sendMessage);
@@ -1376,8 +1376,8 @@ chatMediaInput.addEventListener('change', () => {
   if (file.type.startsWith('image/')) {
     showToast('Сжатие и отправка...');
     compressImage(file, 800, 0.65, async (compressedBase64) => {
-      if (window.sendFirebaseMessage) {
-        await window.sendFirebaseMessage(myProfile.name || 'Я', c.name, '', 'image', { photo: compressedBase64 });
+      if (window.sendSupabaseMessage) {
+        await window.sendSupabaseMessage(myProfile.name || 'Я', c.name, '', 'image', { photo: compressedBase64 });
         showToast('Фото отправлено ✓');
       }
     });
@@ -1389,8 +1389,8 @@ chatMediaInput.addEventListener('change', () => {
     showToast('Загрузка видео...');
     const reader = new FileReader();
     reader.onload = async (e) => {
-      if (window.sendFirebaseMessage) {
-        await window.sendFirebaseMessage(myProfile.name || 'Я', c.name, '', 'video', { video: e.target.result });
+      if (window.sendSupabaseMessage) {
+        await window.sendSupabaseMessage(myProfile.name || 'Я', c.name, '', 'video', { video: e.target.result });
         showToast('Видео отправлено ✓');
       }
     };
@@ -1461,9 +1461,9 @@ async function startRecording() {
     const reader = new FileReader();
     reader.onloadend = async () => {
       const base64Audio = reader.result;
-      if (currentChatId && window.sendFirebaseMessage) {
+      if (currentChatId && window.sendSupabaseMessage) {
         const c = chats[currentChatId];
-        await window.sendFirebaseMessage(myProfile.name || 'Я', c.name, '', 'voice', { audio: base64Audio, duration });
+        await window.sendSupabaseMessage(myProfile.name || 'Я', c.name, '', 'voice', { audio: base64Audio, duration });
         showToast('Голосовое отправлено ✓');
       }
     };
@@ -1710,8 +1710,8 @@ saveProfileBtn.addEventListener('click', async () => {
   myProfile.country = document.getElementById('selectCountryLabel').textContent;
   myProfile.city = document.getElementById('selectCityLabel').textContent;
 
-  if (window.saveProfileToFirebase) {
-    const isSaved = await window.saveProfileToFirebase(myProfile);
+  if (window.saveProfileToSupabase) {
+    const isSaved = await window.saveProfileToSupabase(myProfile);
     if (!isSaved) {
       showToast('Ошибка при сохранении на сервер');
       setSaveBtnState('is-error', 'Ошибка сохранения');
@@ -1733,11 +1733,11 @@ saveProfileBtn.addEventListener('click', async () => {
 <script>
   // Настройки подключения к Supabase
   const SUPABASE_URL = 'https://zdrggxhlovoebumdnyyp.supabase.co';
-  const SUPABASE_KEY = 'sb_publishable_0lbK1fRnD_SR4NSGCLAjVA_1Igl0D2M'; // sb_publishable_... или anon key
+  const SUPABASE_KEY = 'ВСТАВЬТЕ_СЮДА_ВАШ_PUBLISHABLE_KEY'; // sb_publishable_... или anon key
   const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
   // 1. Сохранение профиля
-  window.saveProfileToFirebase = async function(profileData) {
+  window.saveProfileToSupabase = async function(profileData) {
     try {
       const payload = {
         name: profileData.name || '',
@@ -1762,7 +1762,7 @@ saveProfileBtn.addEventListener('click', async () => {
   };
 
   // 2. Загрузка всех профилей для ленты
-  window.loadProfilesFromFirebase = async function() {
+  window.loadProfilesFromSupabase = async function() {
     try {
       const { data, error } = await sb.from('users').select('*');
       if (error) throw error;
@@ -1788,7 +1788,7 @@ saveProfileBtn.addEventListener('click', async () => {
   };
 
   // 3. Отправка сообщений
-  window.sendFirebaseMessage = async function(senderName, receiverName, messageText, type = 'text', extraData = {}) {
+  window.sendSupabaseMessage = async function(senderName, receiverName, messageText, type = 'text', extraData = {}) {
     try {
       const { error } = await sb.from('messages').insert([{
         sender: senderName,
@@ -1860,7 +1860,7 @@ saveProfileBtn.addEventListener('click', async () => {
   };
 
   // 5. Прослушивание чата в реальном времени (Realtime)
-  window.listenFirebaseChat = function(currentUserName, partnerName, onNewMessageCallback) {
+  window.listenSupabaseChat = function(currentUserName, partnerName, onNewMessageCallback) {
     const fetchAndFilter = async () => {
       const { data } = await sb.from('messages').select('*');
       if (!data) return;
