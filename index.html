@@ -1,586 +1,571 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Приложение знакомств — Узбекистан</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Приложение знакомств — прототип</title>
 
-<!-- Telegram WebApp SDK -->
-<script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <!-- 1. Telegram WebApp SDK -->
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
-<!-- Google Search Verification -->
-<meta name="google-site-verification" content="q2i0tuwRI_KIDqv-KdtyqbgpbPmCJT_UuJWCUL3FEqE" />
+  <!-- 2. Google Search Console -->
+  <meta name="google-site-verification" content="q2i0tuwRI_KIDqv-KdtyqbgpbPmCJT_UuJWCUL3FEqE" />
 
-<!-- Яндекс Метрика -->
-<script type="text/javascript">
-    (function(m,e,t,r,i,k,a){
-        m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
-        m[i].l=1*new Date();
-        for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
-        k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)
-    })(window, document,'script','https://mc.yandex.ru/metrika/tag.js?id=112081636', 'ym');
+  <!-- 3. Яндекс Метрика -->
+  <script type="text/javascript">
+      (function(m,e,t,r,i,k,a){
+          m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+          m[i].l=1*new Date();
+          for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
+          k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)
+      })(window, document,'script','https://mc.yandex.ru/metrika/tag.js?id=112081636', 'ym');
 
-    ym(112081636, 'init', {ssr:true, webvisor:true, clickmap:true, ecommerce:"dataLayer", referrer: document.referrer, url: location.href, accurateTrackBounce:true, trackLinks:true});
-</script>
-<noscript><div><img src="https://mc.yandex.ru/watch/112081636" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+      ym(112081636, 'init', {ssr:true, webvisor:true, clickmap:true, ecommerce:"dataLayer", referrer: document.referrer, url: location.href, accurateTrackBounce:true, trackLinks:true});
+  </script>
 
-<!-- Google Maps API -->
-<script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places" async defer></script>
+  <!-- 4. Google Maps API -->
+  <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places" async defer></script>
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- Подключение шрифтов -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-<style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  html, body { height: 100%; }
-  body {
-    background: #0b0b0d;
-    background-image:
-      radial-gradient(circle at 20% 10%, rgba(255,255,255,0.035), transparent 40%),
-      radial-gradient(circle at 80% 90%, rgba(255,255,255,0.03), transparent 40%);
-    color: #e9e9ee;
-    font-family: 'Plus Jakarta Sans', sans-serif;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 32px 16px 64px;
-  }
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; }
+    body {
+      background: #0b0b0d;
+      background-image:
+        radial-gradient(circle at 20% 10%, rgba(255,255,255,0.035), transparent 40%),
+        radial-gradient(circle at 80% 90%, rgba(255,255,255,0.03), transparent 40%);
+      color: #e9e9ee;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 32px 16px 64px;
+    }
 
-  /* ---------- phone frame ---------- */
-  .phone {
-    width: 100%; max-width: 390px; border-radius: 44px; padding: 14px;
-    background: #050506;
-    box-shadow: 0 40px 80px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.04);
-  }
-  .screen {
-    background: var(--bg); border-radius: 32px; overflow: hidden;
-    height: 780px; display: flex; flex-direction: column;
-    font-family: var(--font-body); color: var(--text);
-    transition: background .25s ease, color .25s ease;
-    position: relative;
-  }
-  .scroll-area { flex: 1; overflow-y: auto; padding: 20px 16px 8px; }
-  .scroll-area::-webkit-scrollbar { width: 0; }
-  .page { display: none; flex: 1; flex-direction: column; overflow: hidden; }
-  .page.active { display: flex; }
+    /* ---------- phone frame ---------- */
+    .phone {
+      width: 100%; max-width: 390px; border-radius: 44px; padding: 14px;
+      background: #050506;
+      box-shadow: 0 40px 80px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.04);
+    }
+    .screen {
+      background: var(--bg); border-radius: 32px; overflow: hidden;
+      height: 780px; display: flex; flex-direction: column;
+      font-family: var(--font-body); color: var(--text);
+      transition: background .25s ease, color .25s ease;
+      position: relative;
+    }
+    .scroll-area { flex: 1; overflow-y: auto; padding: 20px 16px 8px; }
+    .scroll-area::-webkit-scrollbar { width: 0; }
+    .page { display: none; flex: 1; flex-direction: column; overflow: hidden; }
+    .page.active { display: flex; }
 
-  /* ---------- shared page title ---------- */
-  .page-title {
-    font-family: var(--font-display);
-    font-weight: 600;
-    font-size: 23px;
-    margin-bottom: 20px;
-    color: var(--text);
-  }
+    /* ---------- shared page title ---------- */
+    .page-title {
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: 23px;
+      margin-bottom: 20px;
+      color: var(--text);
+    }
 
-  /* =========================================================
-     SEARCH PAGE
-     ========================================================= */
-  .stories-row { display: flex; gap: 16px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 18px; flex-shrink: 0; }
-  .stories-row::-webkit-scrollbar { display: none; }
-  .story-item { display: flex; flex-direction: column; align-items: center; gap: 6px; flex: 0 0 auto; }
-  .story-ring {
-    width: 60px; height: 60px; border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    background: var(--story-ring);
-    padding: 2.5px;
-  }
-  .story-ring.has-story { background: var(--accent-grad); }
-  .story-avatar {
-    width: 100%; height: 100%; border-radius: 50%;
-    background: var(--surface-2);
-    display: flex; align-items: center; justify-content: center;
-    color: var(--text-muted);
-    border: 2px solid var(--bg);
-    font-family: var(--font-display); font-weight: 600; font-size: 15px;
-  }
-  .story-avatar.add { color: var(--accent-solid); font-size: 20px; }
-  .story-label { font-size: 11px; color: var(--text-faint); font-weight: 500; }
+    /* SEARCH PAGE */
+    .stories-row { display: flex; gap: 16px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 18px; flex-shrink: 0; }
+    .stories-row::-webkit-scrollbar { display: none; }
+    .story-item { display: flex; flex-direction: column; align-items: center; gap: 6px; flex: 0 0 auto; }
+    .story-ring {
+      width: 60px; height: 60px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      background: var(--story-ring);
+      padding: 2.5px;
+    }
+    .story-ring.has-story { background: var(--accent-grad); }
+    .story-avatar {
+      width: 100%; height: 100%; border-radius: 50%;
+      background: var(--surface-2);
+      display: flex; align-items: center; justify-content: center;
+      color: var(--text-muted);
+      border: 2px solid var(--bg);
+      font-family: var(--font-display); font-weight: 600; font-size: 15px;
+    }
+    .story-avatar.add { color: var(--accent-solid); font-size: 20px; }
+    .story-label { font-size: 11px; color: var(--text-faint); font-weight: 500; }
 
-  .discover-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-lg);
-    overflow: hidden;
-    box-shadow: var(--card-shadow);
-    margin-bottom: 18px;
-  }
-  .card-photo {
-    position: relative;
-    aspect-ratio: 4 / 5;
-    background: var(--photo-grad);
-    display: flex; align-items: flex-end; justify-content: center;
-    overflow: hidden;
-  }
-  .card-photo svg.silhouette { width: 46%; opacity: 0.16; color: #fff; margin-bottom: -6%; }
-  .progress-segments { position: absolute; top: 10px; left: 10px; right: 10px; display: flex; gap: 4px; z-index: 2; }
-  .progress-segments span { flex: 1; height: 3px; border-radius: 2px; background: rgba(255,255,255,0.28); }
-  .progress-segments span.active { background: rgba(255,255,255,0.92); }
-  .compat-badge {
-    position: absolute; top: 22px; right: 14px; z-index: 2;
-    display: flex; align-items: center; gap: 5px;
-    padding: 7px 12px 7px 10px; border-radius: 999px;
-    background: var(--badge-bg); backdrop-filter: blur(6px);
-    font-family: var(--font-display); font-weight: 600; font-size: 13px;
-    color: var(--badge-text);
-    box-shadow: 0 8px 20px rgba(0,0,0,0.25);
-  }
-  .compat-badge svg { width: 14px; height: 14px; }
-  .photo-scrim {
-    position: absolute; left: 0; right: 0; bottom: 0; height: 40%;
-    background: linear-gradient(to top, rgba(0,0,0,0.55), transparent);
-    z-index: 1;
-  }
-  .card-info { padding: 18px; }
-  .name-row { display: flex; align-items: baseline; gap: 6px; margin-bottom: 8px; }
-  .name-row .name { font-family: var(--font-display); font-weight: 600; font-size: 21px; color: var(--text); }
-  .name-row .age { font-family: var(--font-display); font-weight: 500; font-size: 18px; color: var(--text-muted); }
-  .meta-row { display: flex; align-items: center; gap: 5px; color: var(--text-muted); font-size: 13.5px; margin-bottom: 14px; }
-  .meta-row svg { width: 14px; height: 14px; flex-shrink: 0; }
-  .info-chip {
-    display: inline-flex; align-items: center; gap: 6px;
-    padding: 8px 13px; border-radius: 999px;
-    background: var(--surface-2); border: 1px solid var(--border);
-    font-size: 13px; color: var(--text); font-weight: 500;
-    margin-bottom: 10px;
-  }
-  .interest-line { display: flex; align-items: center; gap: 6px; font-size: 13.5px; color: var(--accent-solid); font-weight: 500; margin-bottom: 18px; }
-  .interest-line svg { width: 14px; height: 14px; flex-shrink: 0; }
-  .action-row { display: grid; grid-template-columns: 0.85fr 1fr 0.85fr; gap: 10px; }
-  .action-btn {
-    display: flex; align-items: center; justify-content: center; gap: 7px;
-    padding: 14px 8px; border-radius: 999px; border: none; cursor: pointer;
-    font-family: var(--font-body); font-weight: 700; font-size: 13.5px;
-  }
-  .action-btn svg { width: 17px; height: 17px; flex-shrink: 0; }
-  .action-btn.pass { background: var(--pass-bg); color: var(--pass-text); border: 1px solid var(--border); }
-  .action-btn.chat { background: var(--chat-bg); color: var(--chat-text); }
-  .action-btn.like { background: var(--accent-grad); color: var(--chip-active-text); box-shadow: var(--btn-shadow); }
+    .discover-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      box-shadow: var(--card-shadow);
+      margin-bottom: 18px;
+    }
+    .card-photo {
+      position: relative;
+      aspect-ratio: 4 / 5;
+      background: var(--photo-grad);
+      display: flex; align-items: flex-end; justify-content: center;
+      overflow: hidden;
+    }
+    .card-photo svg.silhouette { width: 46%; opacity: 0.16; color: #fff; margin-bottom: -6%; }
+    .progress-segments { position: absolute; top: 10px; left: 10px; right: 10px; display: flex; gap: 4px; z-index: 2; }
+    .progress-segments span { flex: 1; height: 3px; border-radius: 2px; background: rgba(255,255,255,0.28); }
+    .progress-segments span.active { background: rgba(255,255,255,0.92); }
+    .compat-badge {
+      position: absolute; top: 22px; right: 14px; z-index: 2;
+      display: flex; align-items: center; gap: 5px;
+      padding: 7px 12px 7px 10px; border-radius: 999px;
+      background: var(--badge-bg); backdrop-filter: blur(6px);
+      font-family: var(--font-display); font-weight: 600; font-size: 13px;
+      color: var(--badge-text);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+    }
+    .compat-badge svg { width: 14px; height: 14px; }
+    .photo-scrim {
+      position: absolute; left: 0; right: 0; bottom: 0; height: 40%;
+      background: linear-gradient(to top, rgba(0,0,0,0.55), transparent);
+      z-index: 1;
+    }
+    .card-info { padding: 18px; }
+    .name-row { display: flex; align-items: baseline; gap: 6px; margin-bottom: 8px; }
+    .name-row .name { font-family: var(--font-display); font-weight: 600; font-size: 21px; color: var(--text); }
+    .name-row .age { font-family: var(--font-display); font-weight: 500; font-size: 18px; color: var(--text-muted); }
+    .meta-row { display: flex; align-items: center; gap: 5px; color: var(--text-muted); font-size: 13.5px; margin-bottom: 14px; }
+    .meta-row svg { width: 14px; height: 14px; flex-shrink: 0; }
+    .info-chip {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 8px 13px; border-radius: 999px;
+      background: var(--surface-2); border: 1px solid var(--border);
+      font-size: 13px; color: var(--text); font-weight: 500;
+      margin-bottom: 10px;
+    }
+    .interest-line { display: flex; align-items: center; gap: 6px; font-size: 13.5px; color: var(--accent-solid); font-weight: 500; margin-bottom: 18px; }
+    .interest-line svg { width: 14px; height: 14px; flex-shrink: 0; }
+    .action-row { display: grid; grid-template-columns: 0.85fr 1fr 0.85fr; gap: 10px; }
+    .action-btn {
+      display: flex; align-items: center; justify-content: center; gap: 7px;
+      padding: 14px 8px; border-radius: 999px; border: none; cursor: pointer;
+      font-family: var(--font-body); font-weight: 700; font-size: 13.5px;
+    }
+    .action-btn svg { width: 17px; height: 17px; flex-shrink: 0; }
+    .action-btn.pass { background: var(--pass-bg); color: var(--pass-text); border: 1px solid var(--border); }
+    .action-btn.chat { background: var(--chat-bg); color: var(--chat-text); }
+    .action-btn.like { background: var(--accent-grad); color: var(--chip-active-text); box-shadow: var(--btn-shadow); }
 
-  /* =========================================================
-     PROFILE PAGE
-     ========================================================= */
-  .avatar-block { display: flex; justify-content: center; margin-bottom: 26px; }
-  .avatar-ring { width: 104px; height: 104px; border-radius: 50%; padding: 3px; background: var(--accent-grad); position: relative; }
-  .avatar-inner {
-    width: 100%; height: 100%; border-radius: 50%;
-    background: var(--surface-2);
-    display: flex; align-items: center; justify-content: center;
-    color: var(--text-muted);
-  }
-  .avatar-cam {
-    position: absolute; right: 0; bottom: 2px;
-    width: 32px; height: 32px; border-radius: 50%;
-    background: var(--accent-solid);
-    display: flex; align-items: center; justify-content: center;
-    border: 3px solid var(--bg);
-    color: #fff;
-  }
-  .card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-lg);
-    padding: 20px 18px;
-    margin-bottom: 16px;
-    box-shadow: var(--card-shadow);
-  }
-  .card-label { font-size: 12.5px; font-weight: 600; color: var(--text-muted); margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
-  .row-3 { display: grid; grid-template-columns: 1.3fr 1fr 1fr; gap: 10px; }
-  .field { display: flex; flex-direction: column; gap: 6px; }
-  .field-hint { font-size: 11.5px; color: var(--text-faint); }
-  .input, select {
-    width: 100%; background: var(--input-bg); border: 1px solid var(--input-border);
-    border-radius: var(--radius-md); padding: 13px 14px; color: var(--text);
-    font-family: inherit; font-size: 14.5px; outline: none;
-    transition: border-color .15s ease, background .15s ease;
-  }
-  .input::placeholder { color: var(--text-faint); }
-  .input:focus, select:focus { border-color: var(--accent-solid); background: var(--input-focus-bg); }
-  .select-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-  .select-fake {
-    display: flex; align-items: center; justify-content: space-between;
-    background: var(--input-bg); border: 1px solid var(--input-border);
-    border-radius: var(--radius-md); padding: 13px 14px; font-size: 14.5px; cursor: pointer;
-  }
-  .select-fake svg { width: 16px; height: 16px; color: var(--text-muted); flex-shrink: 0; }
-  .goal-scroll { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; margin: 0 -2px; }
-  .goal-scroll::-webkit-scrollbar { display: none; }
-  .goal-chip {
-    flex: 0 0 auto; display: flex; align-items: center; gap: 6px;
-    padding: 10px 14px; border-radius: 999px; border: 1px solid var(--border);
-    background: var(--surface-2); color: var(--text-muted); font-size: 13.5px; font-weight: 500;
-    cursor: pointer; white-space: nowrap; transition: all .15s ease;
-  }
-  .goal-chip input { display: none; }
-  .goal-chip:has(input:checked) { background: var(--accent-grad); color: var(--chip-active-text); border-color: transparent; }
-  .tag-wrap { display: flex; flex-wrap: wrap; gap: 8px; }
-  .tag { display: flex; align-items: center; gap: 6px; background: var(--surface-2); border: 1px solid var(--border); color: var(--text); padding: 8px 12px; border-radius: 999px; font-size: 13.5px; }
-  .tag button { all: unset; cursor: pointer; color: var(--text-faint); display: flex; width: 14px; height: 14px; }
-  .tag-add { display: flex; align-items: center; gap: 6px; padding: 8px 14px 8px 10px; border-radius: 999px; border: 1px dashed var(--border); color: var(--text-muted); font-size: 13.5px; background: transparent; cursor: pointer; }
-  .segmented { display: grid; grid-template-columns: repeat(3, 1fr); background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 4px; gap: 4px; margin-bottom: 18px; }
-  .segmented label { text-align: center; padding: 9px 4px; font-size: 12.5px; font-weight: 600; border-radius: calc(var(--radius-md) - 4px); color: var(--text-muted); cursor: pointer; }
-  .segmented input { display: none; }
-  .segmented input:checked + label { background: var(--accent-grad); color: var(--chip-active-text); }
-  .range-block { margin-bottom: 18px; }
-  .range-top { display: flex; justify-content: space-between; margin-bottom: 10px; }
-  .range-title { font-size: 13px; color: var(--text-muted); font-weight: 500; }
-  .range-value { font-size: 13px; color: var(--text); font-weight: 600; }
-  .dual-range { position: relative; height: 30px; overflow: hidden; }
-  .dual-range .track { position: absolute; top: 50%; left: 0; right: 0; height: 4px; background: var(--border); border-radius: 2px; transform: translateY(-50%); }
-  .dual-range .fill { position: absolute; top: 50%; height: 4px; background: var(--accent-grad); border-radius: 2px; transform: translateY(-50%); }
-  .dual-range input[type="range"] { position: absolute; top: 0; left: 0; width: 100%; height: 30px; margin: 0; background: transparent; -webkit-appearance: none; pointer-events: none; }
-  .dual-range input[type="range"]::-webkit-slider-runnable-track { background: transparent; }
-  .dual-range input[type="range"]::-moz-range-track { background: transparent; }
-  .dual-range input[type="range"]::-webkit-slider-thumb { pointer-events: auto; -webkit-appearance: none; width: 20px; height: 20px; border-radius: 50%; background: var(--accent-solid); border: 3px solid var(--bg); box-shadow: 0 2px 6px rgba(0,0,0,0.35); cursor: pointer; margin-top: 0; }
-  .dual-range input[type="range"]::-moz-range-thumb { pointer-events: auto; width: 20px; height: 20px; border-radius: 50%; background: var(--accent-solid); border: 3px solid var(--bg); box-shadow: 0 2px 6px rgba(0,0,0,0.35); cursor: pointer; }
-  .save-btn {
-    width: 100%; padding: 16px; border: none; border-radius: var(--radius-md);
-    background: var(--accent-grad); color: var(--chip-active-text);
-    font-family: var(--font-display); font-weight: 600; font-size: 15px; cursor: pointer;
-    box-shadow: var(--btn-shadow); margin-bottom: 22px;
-    transition: background .2s ease, color .2s ease;
-  }
-  .save-btn.is-success { background: #3DDC84; color: #0A2415; box-shadow: none; }
-  .save-btn.is-error { background: var(--danger); color: #2A0A0A; box-shadow: none; }
-  .blocked-row { display: flex; align-items: center; gap: 8px; color: var(--danger); font-size: 13.5px; font-weight: 600; margin-bottom: 6px; }
-  .blocked-empty { font-size: 13px; color: var(--text-faint); margin-bottom: 20px; }
+    /* PROFILE PAGE */
+    .avatar-block { display: flex; justify-content: center; margin-bottom: 26px; }
+    .avatar-ring { width: 104px; height: 104px; border-radius: 50%; padding: 3px; background: var(--accent-grad); position: relative; }
+    .avatar-inner {
+      width: 100%; height: 100%; border-radius: 50%;
+      background: var(--surface-2);
+      display: flex; align-items: center; justify-content: center;
+      color: var(--text-muted);
+    }
+    .avatar-cam {
+      position: absolute; right: 0; bottom: 2px;
+      width: 32px; height: 32px; border-radius: 50%;
+      background: var(--accent-solid);
+      display: flex; align-items: center; justify-content: center;
+      border: 3px solid var(--bg);
+      color: #fff;
+    }
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 20px 18px;
+      margin-bottom: 16px;
+      box-shadow: var(--card-shadow);
+    }
+    .card-label { font-size: 12.5px; font-weight: 600; color: var(--text-muted); margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+    .row-3 { display: grid; grid-template-columns: 1.3fr 1fr 1fr; gap: 10px; }
+    .field { display: flex; flex-direction: column; gap: 6px; }
+    .field-hint { font-size: 11.5px; color: var(--text-faint); }
+    .input {
+      width: 100%; background: var(--input-bg); border: 1px solid var(--input-border);
+      border-radius: var(--radius-md); padding: 13px 14px; color: var(--text);
+      font-family: inherit; font-size: 14.5px; outline: none;
+      transition: border-color .15s ease, background .15s ease;
+    }
+    .input::placeholder { color: var(--text-faint); }
+    .input:focus { border-color: var(--accent-solid); background: var(--input-focus-bg); }
+    .select-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .select-fake {
+      display: flex; align-items: center; justify-content: space-between;
+      background: var(--input-bg); border: 1px solid var(--input-border);
+      border-radius: var(--radius-md); padding: 13px 14px; font-size: 14.5px; cursor: pointer;
+    }
+    .select-fake svg { width: 16px; height: 16px; color: var(--text-muted); flex-shrink: 0; }
+    .goal-scroll { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; margin: 0 -2px; }
+    .goal-scroll::-webkit-scrollbar { display: none; }
+    .goal-chip {
+      flex: 0 0 auto; display: flex; align-items: center; gap: 6px;
+      padding: 10px 14px; border-radius: 999px; border: 1px solid var(--border);
+      background: var(--surface-2); color: var(--text-muted); font-size: 13.5px; font-weight: 500;
+      cursor: pointer; white-space: nowrap; transition: all .15s ease;
+    }
+    .goal-chip input { display: none; }
+    .goal-chip:has(input:checked) { background: var(--accent-grad); color: var(--chip-active-text); border-color: transparent; }
+    .tag-wrap { display: flex; flex-wrap: wrap; gap: 8px; }
+    .tag { display: flex; align-items: center; gap: 6px; background: var(--surface-2); border: 1px solid var(--border); color: var(--text); padding: 8px 12px; border-radius: 999px; font-size: 13.5px; }
+    .tag button { all: unset; cursor: pointer; color: var(--text-faint); display: flex; width: 14px; height: 14px; }
+    .tag-add { display: flex; align-items: center; gap: 6px; padding: 8px 14px 8px 10px; border-radius: 999px; border: 1px dashed var(--border); color: var(--text-muted); font-size: 13.5px; background: transparent; cursor: pointer; }
+    .segmented { display: grid; grid-template-columns: repeat(3, 1fr); background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 4px; gap: 4px; margin-bottom: 18px; }
+    .segmented label { text-align: center; padding: 9px 4px; font-size: 12.5px; font-weight: 600; border-radius: calc(var(--radius-md) - 4px); color: var(--text-muted); cursor: pointer; }
+    .segmented input { display: none; }
+    .segmented input:checked + label { background: var(--accent-grad); color: var(--chip-active-text); }
+    .range-block { margin-bottom: 18px; }
+    .range-top { display: flex; justify-content: space-between; margin-bottom: 10px; }
+    .range-title { font-size: 13px; color: var(--text-muted); font-weight: 500; }
+    .range-value { font-size: 13px; color: var(--text); font-weight: 600; }
+    .dual-range { position: relative; height: 30px; overflow: hidden; }
+    .dual-range .track { position: absolute; top: 50%; left: 0; right: 0; height: 4px; background: var(--border); border-radius: 2px; transform: translateY(-50%); }
+    .dual-range .fill { position: absolute; top: 50%; height: 4px; background: var(--accent-grad); border-radius: 2px; transform: translateY(-50%); }
+    .dual-range input[type="range"] { position: absolute; top: 0; left: 0; width: 100%; height: 30px; margin: 0; background: transparent; -webkit-appearance: none; pointer-events: none; }
+    .dual-range input[type="range"]::-webkit-slider-runnable-track { background: transparent; }
+    .dual-range input[type="range"]::-moz-range-track { background: transparent; }
+    .dual-range input[type="range"]::-webkit-slider-thumb { pointer-events: auto; -webkit-appearance: none; width: 20px; height: 20px; border-radius: 50%; background: var(--accent-solid); border: 3px solid var(--bg); box-shadow: 0 2px 6px rgba(0,0,0,0.35); cursor: pointer; margin-top: 0; }
+    .dual-range input[type="range"]::-moz-range-thumb { pointer-events: auto; width: 20px; height: 20px; border-radius: 50%; background: var(--accent-solid); border: 3px solid var(--bg); box-shadow: 0 2px 6px rgba(0,0,0,0.35); cursor: pointer; }
+    .save-btn {
+      width: 100%; padding: 16px; border: none; border-radius: var(--radius-md);
+      background: var(--accent-grad); color: var(--chip-active-text);
+      font-family: var(--font-display); font-weight: 600; font-size: 15px; cursor: pointer;
+      box-shadow: var(--btn-shadow); margin-bottom: 22px;
+      transition: background .2s ease, color .2s ease;
+    }
+    .save-btn.is-success { background: #3DDC84; color: #0A2415; box-shadow: none; }
+    .save-btn.is-error { background: var(--danger); color: #2A0A0A; box-shadow: none; }
+    .blocked-row { display: flex; align-items: center; gap: 8px; color: var(--danger); font-size: 13.5px; font-weight: 600; margin-bottom: 6px; }
+    .blocked-empty { font-size: 13px; color: var(--text-faint); margin-bottom: 20px; }
 
-  /* =========================================================
-     CHAT PAGE
-     ========================================================= */
-  .chat-page-inner { display: flex; flex-direction: column; flex: 1; overflow: hidden; padding: 0; }
-  .chat-header {
-    display: flex; align-items: center; gap: 10px;
-    padding: 16px 16px 14px;
-    background: var(--header-bg);
-    border-bottom: 1px solid var(--border);
-    flex: 0 0 auto;
-  }
-  .back-btn {
-    display: flex; align-items: center; gap: 6px;
-    background: var(--surface-2); border: 1px solid var(--border);
-    color: var(--text); font-family: inherit; font-weight: 600; font-size: 13px;
-    padding: 8px 13px; border-radius: 999px; cursor: pointer; flex: 0 0 auto;
-  }
-  .back-btn svg { width: 14px; height: 14px; }
-  .chat-peer { display: flex; align-items: center; gap: 9px; flex: 1; min-width: 0; }
-  .peer-avatar-wrap { position: relative; flex: 0 0 auto; }
-  .peer-avatar {
-    width: 38px; height: 38px; border-radius: 50%;
-    background: var(--photo-grad);
-    display: flex; align-items: center; justify-content: center;
-    color: rgba(255,255,255,0.65); font-family: var(--font-display); font-weight: 600; font-size: 14px;
-  }
-  .online-dot {
-    position: absolute; right: -1px; bottom: -1px;
-    width: 11px; height: 11px; border-radius: 50%;
-    background: #3DDC84; border: 2px solid var(--header-bg);
-  }
-  .peer-name { font-family: var(--font-display); font-weight: 600; font-size: 15.5px; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .block-btn {
-    flex: 0 0 auto; display: flex; align-items: center; gap: 5px;
-    background: var(--block-bg); color: var(--block-text);
-    border: none; padding: 8px 14px; border-radius: 999px;
-    font-family: inherit; font-weight: 700; font-size: 12.5px; cursor: pointer;
-  }
-  .block-btn svg { width: 13px; height: 13px; }
+    /* CHAT PAGE */
+    .chat-page-inner { display: flex; flex-direction: column; flex: 1; overflow: hidden; padding: 0; }
+    .chat-header {
+      display: flex; align-items: center; gap: 10px;
+      padding: 16px 16px 14px;
+      background: var(--header-bg);
+      border-bottom: 1px solid var(--border);
+      flex: 0 0 auto;
+    }
+    .back-btn {
+      display: flex; align-items: center; gap: 6px;
+      background: var(--surface-2); border: 1px solid var(--border);
+      color: var(--text); font-family: inherit; font-weight: 600; font-size: 13px;
+      padding: 8px 13px; border-radius: 999px; cursor: pointer; flex: 0 0 auto;
+    }
+    .back-btn svg { width: 14px; height: 14px; }
+    .chat-peer { display: flex; align-items: center; gap: 9px; flex: 1; min-width: 0; }
+    .peer-avatar-wrap { position: relative; flex: 0 0 auto; }
+    .peer-avatar {
+      width: 38px; height: 38px; border-radius: 50%;
+      background: var(--photo-grad);
+      display: flex; align-items: center; justify-content: center;
+      color: rgba(255,255,255,0.65); font-family: var(--font-display); font-weight: 600; font-size: 14px; overflow: hidden;
+    }
+    .online-dot {
+      position: absolute; right: -1px; bottom: -1px;
+      width: 11px; height: 11px; border-radius: 50%;
+      background: #3DDC84; border: 2px solid var(--header-bg);
+    }
+    .peer-name { font-family: var(--font-display); font-weight: 600; font-size: 15.5px; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .block-btn {
+      flex: 0 0 auto; display: flex; align-items: center; gap: 5px;
+      background: var(--block-bg); color: var(--block-text);
+      border: none; padding: 8px 14px; border-radius: 999px;
+      font-family: inherit; font-weight: 700; font-size: 12.5px; cursor: pointer;
+    }
+    .block-btn svg { width: 13px; height: 13px; }
 
-  .chat-messages {
-    flex: 1; overflow-y: auto; padding: 18px 14px; display: flex; flex-direction: column; gap: 10px;
-  }
-  .chat-messages::-webkit-scrollbar { width: 0; }
-  .msg-row { display: flex; }
-  .msg-row.in { justify-content: flex-start; }
-  .msg-row.out { justify-content: flex-end; }
-  .bubble {
-    max-width: 76%; padding: 11px 14px; font-size: 14.5px; line-height: 1.4;
-    display: flex; align-items: flex-end; gap: 6px; flex-wrap: wrap;
-  }
-  .bubble .msg-text { flex: 1; min-width: 0; word-wrap: break-word; }
-  .bubble .msg-meta { display: flex; align-items: center; gap: 3px; flex: 0 0 auto; opacity: 0.8; }
-  .bubble .msg-meta svg { width: 14px; height: 14px; }
-  .msg-row.in .bubble {
-    background: var(--bubble-in-bg); color: var(--bubble-in-text);
-    border-radius: 18px 18px 18px 5px;
-    border: 1px solid var(--border);
-  }
-  .msg-row.out .bubble {
-    background: var(--accent-grad); color: var(--bubble-out-text);
-    border-radius: 18px 18px 5px 18px;
-  }
-  .day-divider { text-align: center; font-size: 11.5px; color: var(--text-faint); margin: 6px 0 8px; }
+    .chat-messages {
+      flex: 1; overflow-y: auto; padding: 18px 14px; display: flex; flex-direction: column; gap: 10px;
+    }
+    .chat-messages::-webkit-scrollbar { width: 0; }
+    .msg-row { display: flex; }
+    .msg-row.in { justify-content: flex-start; }
+    .msg-row.out { justify-content: flex-end; }
+    .bubble {
+      max-width: 76%; padding: 11px 14px; font-size: 14.5px; line-height: 1.4;
+      display: flex; align-items: flex-end; gap: 6px; flex-wrap: wrap;
+    }
+    .bubble .msg-text { flex: 1; min-width: 0; word-wrap: break-word; }
+    .bubble .msg-meta { display: flex; align-items: center; gap: 3px; flex: 0 0 auto; opacity: 0.85; }
+    .bubble .msg-meta svg { width: 14px; height: 14px; }
+    .msg-meta.read svg { color: #38bdf8; }
+    .msg-row.in .bubble {
+      background: var(--bubble-in-bg); color: var(--bubble-in-text);
+      border-radius: 18px 18px 18px 5px;
+      border: 1px solid var(--border);
+    }
+    .msg-row.out .bubble {
+      background: var(--accent-grad); color: var(--bubble-out-text);
+      border-radius: 18px 18px 5px 18px;
+    }
+    .day-divider { text-align: center; font-size: 11.5px; color: var(--text-faint); margin: 6px 0 8px; }
 
-  .chat-input-bar {
-    flex: 0 0 auto; display: flex; align-items: center; gap: 8px;
-    padding: 12px 14px; background: var(--header-bg); border-top: 1px solid var(--border);
-  }
-  .tool-btn {
-    flex: 0 0 auto; width: 40px; height: 40px; border-radius: 50%;
-    background: var(--tool-btn-bg); border: 1px solid var(--border);
-    display: flex; align-items: center; justify-content: center; cursor: pointer;
-    color: var(--text-muted);
-  }
-  .tool-btn svg { width: 18px; height: 18px; }
-  .chat-input {
-    flex: 1; min-width: 0;
-    background: var(--input-bg); border: 1px solid var(--input-border);
-    border-radius: 999px; padding: 11px 16px; color: var(--text);
-    font-family: inherit; font-size: 14px; outline: none;
-  }
-  .chat-input::placeholder { color: var(--text-faint); }
-  .send-btn {
-    flex: 0 0 auto; width: 42px; height: 42px; border-radius: 50%; border: none;
-    background: var(--accent-grad); color: var(--chip-active-text);
-    display: flex; align-items: center; justify-content: center; cursor: pointer;
-    box-shadow: var(--btn-shadow);
-  }
-  .send-btn svg { width: 17px; height: 17px; margin-left: 2px; }
+    .chat-input-bar {
+      flex: 0 0 auto; display: flex; align-items: center; gap: 8px;
+      padding: 12px 14px; background: var(--header-bg); border-top: 1px solid var(--border);
+    }
+    .tool-btn {
+      flex: 0 0 auto; width: 40px; height: 40px; border-radius: 50%;
+      background: var(--tool-btn-bg); border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center; cursor: pointer;
+      color: var(--text-muted);
+    }
+    .tool-btn svg { width: 18px; height: 18px; }
+    .chat-input {
+      flex: 1; min-width: 0;
+      background: var(--input-bg); border: 1px solid var(--input-border);
+      border-radius: 999px; padding: 11px 16px; color: var(--text);
+      font-family: inherit; font-size: 14px; outline: none;
+    }
+    .chat-input::placeholder { color: var(--text-faint); }
+    .send-btn {
+      flex: 0 0 auto; width: 42px; height: 42px; border-radius: 50%; border: none;
+      background: var(--accent-grad); color: var(--chip-active-text);
+      display: flex; align-items: center; justify-content: center; cursor: pointer;
+      box-shadow: var(--btn-shadow);
+    }
+    .send-btn svg { width: 17px; height: 17px; margin-left: 2px; }
 
-  /* photo message */
-  .bubble.photo-bubble { padding: 5px; background: transparent !important; border: none !important; }
-  .msg-photo { max-width: 190px; max-height: 240px; border-radius: 16px; display: block; cursor: pointer; object-fit: cover; }
-  .msg-row.in .bubble.photo-bubble { background: var(--bubble-in-bg) !important; padding: 5px; border: 1px solid var(--border) !important; }
-  .msg-row.out .bubble.photo-bubble { background: transparent !important; }
+    .bubble.photo-bubble, .bubble.video-bubble { padding: 5px; background: transparent !important; border: none !important; }
+    .msg-photo, .msg-video { max-width: 190px; max-height: 240px; border-radius: 16px; display: block; cursor: pointer; object-fit: cover; }
+    .msg-row.in .bubble.photo-bubble, .msg-row.in .bubble.video-bubble { background: var(--bubble-in-bg) !important; padding: 5px; border: 1px solid var(--border) !important; }
 
-  /* voice message */
-  .voice-msg { display: flex; align-items: center; gap: 10px; min-width: 168px; padding: 2px 2px; }
-  .voice-play-btn {
-    flex: 0 0 auto; width: 34px; height: 34px; border-radius: 50%; border: none; cursor: pointer;
-    display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.22); color: inherit;
-  }
-  .msg-row.in .voice-play-btn { background: var(--accent-grad); color: var(--chip-active-text); }
-  .voice-play-btn svg { width: 14px; height: 14px; }
-  .voice-track { flex: 1; display: flex; flex-direction: column; gap: 5px; min-width: 0; }
-  .voice-bar { position: relative; height: 4px; border-radius: 2px; background: rgba(255,255,255,0.3); overflow: hidden; }
-  .msg-row.in .voice-bar { background: var(--border); }
-  .voice-bar-fill { position: absolute; left: 0; top: 0; bottom: 0; width: 0%; background: currentColor; border-radius: 2px; }
-  .voice-time { font-size: 11px; opacity: 0.85; }
+    .voice-msg { display: flex; align-items: center; gap: 10px; min-width: 168px; padding: 2px 2px; }
+    .voice-play-btn {
+      flex: 0 0 auto; width: 34px; height: 34px; border-radius: 50%; border: none; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.22); color: inherit;
+    }
+    .msg-row.in .voice-play-btn { background: var(--accent-grad); color: var(--chip-active-text); }
+    .voice-play-btn svg { width: 14px; height: 14px; }
+    .voice-track { flex: 1; display: flex; flex-direction: column; gap: 5px; min-width: 0; }
+    .voice-bar { position: relative; height: 4px; border-radius: 2px; background: rgba(255,255,255,0.3); overflow: hidden; }
+    .msg-row.in .voice-bar { background: var(--border); }
+    .voice-bar-fill { position: absolute; left: 0; top: 0; bottom: 0; width: 0%; background: currentColor; border-radius: 2px; }
+    .voice-time { font-size: 11px; opacity: 0.85; }
 
-  /* recording bar */
-  .recording-bar {
-    display: none; align-items: center; gap: 10px;
-    padding: 12px 14px; background: var(--header-bg); border-top: 1px solid var(--border);
-    flex: 0 0 auto;
-  }
-  .recording-bar.active { display: flex; }
-  .recording-dot { width: 10px; height: 10px; border-radius: 50%; background: #FF5D5D; flex: 0 0 auto; animation: recPulse 1s infinite ease-in-out; }
-  @keyframes recPulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
-  .recording-time { font-family: var(--font-display); font-weight: 600; font-size: 13.5px; color: var(--text); flex: 0 0 auto; }
-  .recording-hint { flex: 1; font-size: 13px; color: var(--text-muted); }
-  .rec-cancel-btn {
-    flex: 0 0 auto; background: var(--surface-2); border: 1px solid var(--border); color: var(--text-muted);
-    font-family: inherit; font-weight: 600; font-size: 12.5px; padding: 8px 12px; border-radius: 999px; cursor: pointer;
-  }
-  .rec-send-btn {
-    flex: 0 0 auto; width: 38px; height: 38px; border-radius: 50%; border: none; cursor: pointer;
-    background: var(--accent-grad); color: var(--chip-active-text); display: flex; align-items: center; justify-content: center;
-  }
-  .rec-send-btn svg { width: 15px; height: 15px; margin-left: 2px; }
-  .tool-btn.recording-active { background: #FF5D5D; color: #fff; }
+    .recording-bar {
+      display: none; align-items: center; gap: 10px;
+      padding: 12px 14px; background: var(--header-bg); border-top: 1px solid var(--border);
+      flex: 0 0 auto;
+    }
+    .recording-bar.active { display: flex; }
+    .recording-dot { width: 10px; height: 10px; border-radius: 50%; background: #FF5D5D; flex: 0 0 auto; animation: recPulse 1s infinite ease-in-out; }
+    @keyframes recPulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
+    .recording-time { font-family: var(--font-display); font-weight: 600; font-size: 13.5px; color: var(--text); flex: 0 0 auto; }
+    .recording-hint { flex: 1; font-size: 13px; color: var(--text-muted); }
+    .rec-cancel-btn {
+      flex: 0 0 auto; background: var(--surface-2); border: 1px solid var(--border); color: var(--text-muted);
+      font-family: inherit; font-weight: 600; font-size: 12.5px; padding: 8px 12px; border-radius: 999px; cursor: pointer;
+    }
+    .rec-send-btn {
+      flex: 0 0 auto; width: 38px; height: 38px; border-radius: 50%; border: none; cursor: pointer;
+      background: var(--accent-grad); color: var(--chip-active-text); display: flex; align-items: center; justify-content: center;
+    }
+    .rec-send-btn svg { width: 15px; height: 15px; margin-left: 2px; }
+    .tool-btn.recording-active { background: #FF5D5D; color: #fff; }
 
-  /* ---------- bottom nav ---------- */
-  .bottom-nav {
-    display: grid; grid-template-columns: repeat(3, 1fr);
-    border-top: 1px solid var(--border);
-    background: var(--nav-bg);
-    padding: 12px 10px 16px;
-    flex-shrink: 0;
-  }
-  .nav-item {
-    display: flex; flex-direction: column; align-items: center; gap: 4px;
-    font-size: 11.5px; color: var(--text-faint); font-weight: 600;
-    background: none; border: none; cursor: pointer; font-family: inherit;
-  }
-  .nav-item svg { width: 21px; height: 21px; }
-  .nav-item.active { color: var(--accent-solid); }
+    /* BOTTOM NAV */
+    .bottom-nav {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      border-top: 1px solid var(--border);
+      background: var(--nav-bg);
+      padding: 12px 10px 16px;
+      flex-shrink: 0;
+    }
+    .nav-item {
+      display: flex; flex-direction: column; align-items: center; gap: 4px;
+      font-size: 11.5px; color: var(--text-faint); font-weight: 600;
+      background: none; border: none; cursor: pointer; font-family: inherit;
+    }
+    .nav-item svg { width: 21px; height: 21px; }
+    .nav-item.active { color: var(--accent-solid); }
 
-  /* =========================================================
-     THEME A — Dark / warm-neon
-     ========================================================= */
-  .phone[data-theme="a"] .screen {
-    --bg: #120C16;
-    --surface: #1C1420;
-    --surface-2: #241A29;
-    --text: #F6F1F8;
-    --text-muted: #A996AE;
-    --text-faint: #7A6D82;
-    --border: rgba(255,255,255,0.07);
-    --accent-solid: #FF5D73;
-    --accent-grad: linear-gradient(120deg, #FF5D73 0%, #FF8B5C 100%);
-    --chip-active-text: #1A0E10;
-    --input-bg: #1A1220;
-    --input-border: rgba(255,255,255,0.08);
-    --input-focus-bg: #201628;
-    --radius-lg: 24px;
-    --radius-md: 15px;
-    --card-shadow: 0 14px 30px rgba(255,60,90,0.08);
-    --btn-shadow: 0 12px 26px rgba(255,93,115,0.35);
-    --danger: #FF6B6B;
-    --nav-bg: #170F1B;
-    --font-display: 'Unbounded', sans-serif;
-    --font-body: 'Plus Jakarta Sans', sans-serif;
-    --photo-grad: linear-gradient(155deg, #3A2340 0%, #5C2A4C 45%, #FF5D73 130%);
-    --story-ring: #2A1F2F;
-    --badge-bg: rgba(28,20,32,0.72);
-    --badge-text: #FFD9DD;
-    --pass-bg: #241A29;
-    --pass-text: #C9BDD0;
-    --chat-bg: #2A2050;
-    --chat-text: #C9BEFF;
-    --header-bg: #170F1B;
-    --bubble-in-bg: #241A29;
-    --bubble-in-text: #F0E9F3;
-    --bubble-out-text: #1A0E10;
-    --block-bg: rgba(255,93,115,0.16);
-    --block-text: #FF8FA0;
-    --tool-btn-bg: #1C1420;
-  }
+    /* THEME A */
+    .phone[data-theme="a"] .screen {
+      --bg: #120C16;
+      --surface: #1C1420;
+      --surface-2: #241A29;
+      --text: #F6F1F8;
+      --text-muted: #A996AE;
+      --text-faint: #7A6D82;
+      --border: rgba(255,255,255,0.07);
+      --accent-solid: #FF5D73;
+      --accent-grad: linear-gradient(120deg, #FF5D73 0%, #FF8B5C 100%);
+      --chip-active-text: #1A0E10;
+      --input-bg: #1A1220;
+      --input-border: rgba(255,255,255,0.08);
+      --input-focus-bg: #201628;
+      --radius-lg: 24px;
+      --radius-md: 15px;
+      --card-shadow: 0 14px 30px rgba(255,60,90,0.08);
+      --btn-shadow: 0 12px 26px rgba(255,93,115,0.35);
+      --danger: #FF6B6B;
+      --nav-bg: #170F1B;
+      --font-display: 'Unbounded', sans-serif;
+      --font-body: 'Plus Jakarta Sans', sans-serif;
+      --photo-grad: linear-gradient(155deg, #3A2340 0%, #5C2A4C 45%, #FF5D73 130%);
+      --story-ring: #2A1F2F;
+      --badge-bg: rgba(28,20,32,0.72);
+      --badge-text: #FFD9DD;
+      --pass-bg: #241A29;
+      --pass-text: #C9BDD0;
+      --chat-bg: #2A2050;
+      --chat-text: #C9BEFF;
+      --header-bg: #170F1B;
+      --bubble-in-bg: #241A29;
+      --bubble-in-text: #F0E9F3;
+      --bubble-out-text: #1A0E10;
+      --block-bg: rgba(255,93,115,0.16);
+      --block-text: #FF8FA0;
+      --tool-btn-bg: #1C1420;
+    }
 
-  @media (max-width: 400px) { .row-3 { gap: 8px; } }
+    @media (max-width: 400px) { .row-3 { gap: 8px; } }
 
-  /* =========================================================
-     APP FUNCTIONALITY ADDITIONS
-     ========================================================= */
-  .story-avatar img, .avatar-inner img, .peer-avatar img, .chat-avatar img {
-    width: 100%; height: 100%; border-radius: 50%; object-fit: cover;
-  }
-  .card-photo img.real-photo {
-    position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0;
-  }
-  .card-photo.has-photo svg.silhouette { display: none; }
-  .story-item { cursor: pointer; background: none; border: none; font-family: inherit; }
-  .story-item:active .story-ring { transform: scale(0.94); }
-  .story-ring { transition: transform .12s ease; }
+    .story-avatar img, .avatar-inner img, .peer-avatar img, .chat-avatar img {
+      width: 100%; height: 100%; border-radius: 50%; object-fit: cover;
+    }
+    .card-photo img.real-photo {
+      position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0;
+    }
+    .card-photo.has-photo svg.silhouette { display: none; }
+    .story-item { cursor: pointer; background: none; border: none; font-family: inherit; }
+    .story-item:active .story-ring { transform: scale(0.94); }
+    .story-ring { transition: transform .12s ease; }
 
-  .action-btn { transition: transform .1s ease, opacity .15s ease; }
-  .action-btn:active { transform: scale(0.93); }
-  .discover-card.leaving { animation: cardLeave .28s ease forwards; }
-  @keyframes cardLeave { to { opacity: 0; transform: translateY(-14px) scale(0.97); } }
-  .discover-card.entering { animation: cardEnter .25s ease; }
-  @keyframes cardEnter { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    .action-btn { transition: transform .1s ease, opacity .15s ease; }
+    .action-btn:active { transform: scale(0.93); }
+    .discover-card.leaving { animation: cardLeave .28s ease forwards; }
+    @keyframes cardLeave { to { opacity: 0; transform: translateY(-14px) scale(0.97); } }
+    .discover-card.entering { animation: cardEnter .25s ease; }
+    @keyframes cardEnter { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-  .empty-deck { text-align: center; padding: 60px 16px; color: var(--text-muted); }
-  .empty-deck .big { font-family: var(--font-display); font-size: 18px; color: var(--text); margin-bottom: 8px; }
+    .empty-deck { text-align: center; padding: 60px 16px; color: var(--text-muted); }
+    .empty-deck .big { font-family: var(--font-display); font-size: 18px; color: var(--text); margin-bottom: 8px; }
 
-  /* toast */
-  .toast {
-    position: absolute; left: 50%; bottom: 96px; transform: translate(-50%, 12px);
-    background: var(--surface-2, #222); color: var(--text, #fff);
-    border: 1px solid var(--border, rgba(255,255,255,0.1));
-    padding: 11px 18px; border-radius: 999px; font-size: 13.5px; font-weight: 600;
-    box-shadow: 0 12px 26px rgba(0,0,0,0.35);
-    opacity: 0; pointer-events: none; transition: opacity .2s ease, transform .2s ease;
-    z-index: 60; white-space: nowrap; max-width: 88%; overflow: hidden; text-overflow: ellipsis;
-  }
-  .toast.show { opacity: 1; transform: translate(-50%, 0); }
+    .toast {
+      position: absolute; left: 50%; bottom: 96px; transform: translate(-50%, 12px);
+      background: var(--surface-2, #222); color: var(--text, #fff);
+      border: 1px solid var(--border, rgba(255,255,255,0.1));
+      padding: 11px 18px; border-radius: 999px; font-size: 13.5px; font-weight: 600;
+      box-shadow: 0 12px 26px rgba(0,0,0,0.35);
+      opacity: 0; pointer-events: none; transition: opacity .2s ease, transform .2s ease;
+      z-index: 60; white-space: nowrap; max-width: 88%; overflow: hidden; text-overflow: ellipsis;
+    }
+    .toast.show { opacity: 1; transform: translate(-50%, 0); }
 
-  /* match overlay */
-  .match-overlay {
-    position: absolute; inset: 0; z-index: 80;
-    background: rgba(5,4,8,0.86); backdrop-filter: blur(4px);
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    padding: 32px 26px; text-align: center;
-    opacity: 0; pointer-events: none; transition: opacity .2s ease;
-  }
-  .match-overlay.show { opacity: 1; pointer-events: auto; }
-  .match-avatars { display: flex; align-items: center; justify-content: center; margin-bottom: 22px; }
-  .match-avatars .m-av {
-    width: 84px; height: 84px; border-radius: 50%; border: 3px solid #fff;
-    background: var(--photo-grad); display: flex; align-items: center; justify-content: center;
-    font-family: var(--font-display); font-weight: 600; font-size: 26px; color: #fff; overflow: hidden;
-  }
-  .match-avatars .m-av:last-child { margin-left: -22px; }
-  .match-title { font-family: var(--font-display); font-weight: 700; font-size: 26px; color: #fff; margin-bottom: 8px; }
-  .match-sub { color: rgba(255,255,255,0.72); font-size: 14px; margin-bottom: 28px; }
-  .match-btn { width: 100%; max-width: 260px; padding: 15px; border: none; border-radius: 999px; font-family: var(--font-display); font-weight: 600; font-size: 14.5px; cursor: pointer; margin-bottom: 10px; }
-  .match-btn.primary { background: var(--accent-grad); color: var(--chip-active-text); }
-  .match-btn.secondary { background: rgba(255,255,255,0.1); color: #fff; }
+    .match-overlay {
+      position: absolute; inset: 0; z-index: 80;
+      background: rgba(5,4,8,0.86); backdrop-filter: blur(4px);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      padding: 32px 26px; text-align: center;
+      opacity: 0; pointer-events: none; transition: opacity .2s ease;
+    }
+    .match-overlay.show { opacity: 1; pointer-events: auto; }
+    .match-avatars { display: flex; align-items: center; justify-content: center; margin-bottom: 22px; }
+    .match-avatars .m-av {
+      width: 84px; height: 84px; border-radius: 50%; border: 3px solid #fff;
+      background: var(--photo-grad); display: flex; align-items: center; justify-content: center;
+      font-family: var(--font-display); font-weight: 600; font-size: 26px; color: #fff; overflow: hidden;
+    }
+    .match-avatars .m-av:last-child { margin-left: -22px; }
+    .match-title { font-family: var(--font-display); font-weight: 700; font-size: 26px; color: #fff; margin-bottom: 8px; }
+    .match-sub { color: rgba(255,255,255,0.72); font-size: 14px; margin-bottom: 28px; }
+    .match-btn { width: 100%; max-width: 260px; padding: 15px; border: none; border-radius: 999px; font-family: var(--font-display); font-weight: 600; font-size: 14.5px; cursor: pointer; margin-bottom: 10px; }
+    .match-btn.primary { background: var(--accent-grad); color: var(--chip-active-text); }
+    .match-btn.secondary { background: rgba(255,255,255,0.1); color: #fff; }
 
-  /* story viewer */
-  .story-viewer {
-    position: absolute; inset: 0; z-index: 90; background: #000;
-    display: flex; flex-direction: column;
-    opacity: 0; pointer-events: none; transition: opacity .15s ease;
-  }
-  .story-viewer.show { opacity: 1; pointer-events: auto; }
-  .story-viewer-bar { display: flex; gap: 4px; padding: 12px 12px 0; flex-shrink: 0; }
-  .story-viewer-bar span { flex: 1; height: 3px; border-radius: 2px; background: rgba(255,255,255,0.3); overflow: hidden; }
-  .story-viewer-bar span i { display: block; height: 100%; width: 0%; background: #fff; }
-  .story-viewer-bar span i.run { animation: storyRun 4s linear forwards; }
-  @keyframes storyRun { to { width: 100%; } }
-  .story-viewer-head { display: flex; align-items: center; gap: 8px; padding: 12px 14px; color: #fff; flex-shrink: 0; }
-  .story-viewer-head .sv-av { width: 30px; height: 30px; border-radius: 50%; background: var(--photo-grad, #444); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; overflow: hidden; }
-  .story-viewer-head .sv-name { font-weight: 600; font-size: 14px; flex: 1; }
-  .story-viewer-head .sv-close { background: rgba(255,255,255,0.15); border: none; color: #fff; width: 28px; height: 28px; border-radius: 50%; cursor: pointer; font-size: 15px; line-height: 1; }
-  .story-viewer-body { flex: 1; display: flex; align-items: center; justify-content: center; overflow: hidden; position: relative; }
-  .story-viewer-body img { width: 100%; height: 100%; object-fit: cover; }
-  .story-viewer-body .sv-placeholder { color: rgba(255,255,255,0.5); font-size: 14px; padding: 20px; text-align: center; }
+    .story-viewer {
+      position: absolute; inset: 0; z-index: 90; background: #000;
+      display: flex; flex-direction: column;
+      opacity: 0; pointer-events: none; transition: opacity .15s ease;
+    }
+    .story-viewer.show { opacity: 1; pointer-events: auto; }
+    .story-viewer-bar { display: flex; gap: 4px; padding: 12px 12px 0; flex-shrink: 0; }
+    .story-viewer-bar span { flex: 1; height: 3px; border-radius: 2px; background: rgba(255,255,255,0.3); overflow: hidden; }
+    .story-viewer-bar span i { display: block; height: 100%; width: 0%; background: #fff; }
+    .story-viewer-bar span i.run { animation: storyRun 4s linear forwards; }
+    @keyframes storyRun { to { width: 100%; } }
+    .story-viewer-head { display: flex; align-items: center; gap: 8px; padding: 12px 14px; color: #fff; flex-shrink: 0; }
+    .story-viewer-head .sv-av { width: 30px; height: 30px; border-radius: 50%; background: var(--photo-grad, #444); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; overflow: hidden; }
+    .story-viewer-head .sv-name { font-weight: 600; font-size: 14px; flex: 1; }
+    .story-viewer-head .sv-close { background: rgba(255,255,255,0.15); border: none; color: #fff; width: 28px; height: 28px; border-radius: 50%; cursor: pointer; font-size: 15px; line-height: 1; }
+    .story-viewer-body { flex: 1; display: flex; align-items: center; justify-content: center; overflow: hidden; position: relative; }
+    .story-viewer-body img, .story-viewer-body video { width: 100%; height: 100%; object-fit: cover; }
+    .story-viewer-body .sv-placeholder { color: rgba(255,255,255,0.5); font-size: 14px; padding: 20px; text-align: center; }
 
-  /* chats list page */
-  .chats-list-page { display: flex; flex-direction: column; flex: 1; overflow: hidden; }
-  .chats-list-head { padding: 20px 16px 14px; flex: 0 0 auto; }
-  .chats-list-body { flex: 1; overflow-y: auto; padding: 0 10px 10px; }
-  .chats-list-body::-webkit-scrollbar { width: 0; }
-  .chat-list-item {
-    display: flex; align-items: center; gap: 12px; padding: 12px 8px;
-    border-radius: 16px; cursor: pointer; width: 100%; background: none; border: none; text-align: left; font-family: inherit;
-  }
-  .chat-list-item:active { background: var(--surface-2); }
-  .chat-avatar {
-    position: relative; flex: 0 0 auto; width: 50px; height: 50px; border-radius: 50%;
-    background: var(--photo-grad); display: flex; align-items: center; justify-content: center;
-    color: rgba(255,255,255,0.75); font-family: var(--font-display); font-weight: 600; font-size: 17px; overflow: hidden;
-  }
-  .chat-list-main { flex: 1; min-width: 0; }
-  .chat-list-top { display: flex; justify-content: space-between; gap: 8px; margin-bottom: 3px; }
-  .chat-list-name { font-weight: 700; font-size: 14.5px; color: var(--text); }
-  .chat-list-time { font-size: 11.5px; color: var(--text-faint); flex-shrink: 0; }
-  .chat-list-preview { font-size: 13px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .chats-empty { text-align: center; padding: 60px 20px; color: var(--text-faint); font-size: 13.5px; }
+    .chats-list-page { display: flex; flex-direction: column; flex: 1; overflow: hidden; }
+    .chats-list-head { padding: 20px 16px 14px; flex: 0 0 auto; }
+    .chats-list-body { flex: 1; overflow-y: auto; padding: 0 10px 10px; }
+    .chats-list-body::-webkit-scrollbar { width: 0; }
+    .chat-list-item {
+      display: flex; align-items: center; gap: 12px; padding: 12px 8px;
+      border-radius: 16px; cursor: pointer; width: 100%; background: none; border: none; text-align: left; font-family: inherit;
+      position: relative;
+    }
+    .chat-list-item:active { background: var(--surface-2); }
+    .chat-avatar {
+      position: relative; flex: 0 0 auto; width: 50px; height: 50px; border-radius: 50%;
+      background: var(--photo-grad); display: flex; align-items: center; justify-content: center;
+      color: rgba(255,255,255,0.75); font-family: var(--font-display); font-weight: 600; font-size: 17px; overflow: hidden;
+    }
+    .chat-list-main { flex: 1; min-width: 0; }
+    .chat-list-top { display: flex; justify-content: space-between; gap: 8px; margin-bottom: 3px; }
+    .chat-list-name { font-weight: 700; font-size: 14.5px; color: var(--text); }
+    .chat-list-time { font-size: 11.5px; color: var(--text-faint); flex-shrink: 0; }
+    .chat-list-bottom { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+    .chat-list-preview { font-size: 13px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1; }
+    .unread-badge {
+      background: #FF5D73; color: #fff; font-size: 11px; font-weight: 700;
+      padding: 2px 7px; border-radius: 999px; min-width: 18px; text-align: center;
+      flex-shrink: 0;
+    }
+    .chats-empty { text-align: center; padding: 60px 20px; color: var(--text-faint); font-size: 13.5px; }
 
-  /* country / city picker */
-  .picker-overlay {
-    position: absolute; inset: 0; z-index: 85;
-    background: rgba(5,4,8,0.72); backdrop-filter: blur(2px);
-    display: flex; align-items: flex-end;
-    opacity: 0; pointer-events: none; transition: opacity .18s ease;
-  }
-  .picker-overlay.show { opacity: 1; pointer-events: auto; }
-  .picker-sheet {
-    width: 100%; max-height: 78%; background: var(--surface); border-radius: 24px 24px 0 0;
-    padding: 18px 16px 16px; display: flex; flex-direction: column;
-    border-top: 1px solid var(--border);
-    transform: translateY(12px); transition: transform .2s ease;
-  }
-  .picker-overlay.show .picker-sheet { transform: translateY(0); }
-  .picker-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; flex: 0 0 auto; }
-  .picker-title { font-family: var(--font-display); font-weight: 600; font-size: 16px; color: var(--text); }
-  .picker-close { background: var(--surface-2); border: none; color: var(--text-muted); width: 28px; height: 28px; border-radius: 50%; cursor: pointer; font-size: 14px; }
-  .picker-search { margin-bottom: 10px; flex: 0 0 auto; }
-  .picker-list { overflow-y: auto; flex: 1; display: flex; flex-direction: column; }
-  .picker-list::-webkit-scrollbar { width: 0; }
-  .picker-item {
-    text-align: left; background: none; border: none; font-family: inherit;
-    padding: 12px 6px; font-size: 14.5px; color: var(--text); cursor: pointer;
-    border-bottom: 1px solid var(--border);
-  }
-  .picker-item:active { background: var(--surface-2); }
-  .picker-item.selected { color: var(--accent-solid); font-weight: 700; }
-  .picker-empty { padding: 24px 6px; color: var(--text-faint); font-size: 13.5px; text-align: center; }
-  .picker-custom-btn {
-    margin-top: 4px; text-align: left; background: none; border: none; font-family: inherit;
-    padding: 12px 6px; font-size: 14px; color: var(--accent-solid); font-weight: 600; cursor: pointer;
-  }
+    .picker-overlay {
+      position: absolute; inset: 0; z-index: 85;
+      background: rgba(5,4,8,0.72); backdrop-filter: blur(2px);
+      display: flex; align-items: flex-end;
+      opacity: 0; pointer-events: none; transition: opacity .18s ease;
+    }
+    .picker-overlay.show { opacity: 1; pointer-events: auto; }
+    .picker-sheet {
+      width: 100%; max-height: 78%; background: var(--surface); border-radius: 24px 24px 0 0;
+      padding: 18px 16px 16px; display: flex; flex-direction: column;
+      border-top: 1px solid var(--border);
+      transform: translateY(12px); transition: transform .2s ease;
+    }
+    .picker-overlay.show .picker-sheet { transform: translateY(0); }
+    .picker-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; flex: 0 0 auto; }
+    .picker-title { font-family: var(--font-display); font-weight: 600; font-size: 16px; color: var(--text); }
+    .picker-close { background: var(--surface-2); border: none; color: var(--text-muted); width: 28px; height: 28px; border-radius: 50%; cursor: pointer; font-size: 14px; }
+    .picker-search { margin-bottom: 10px; flex: 0 0 auto; }
+    .picker-list { overflow-y: auto; flex: 1; display: flex; flex-direction: column; }
+    .picker-list::-webkit-scrollbar { width: 0; }
+    .picker-item {
+      text-align: left; background: none; border: none; font-family: inherit;
+      padding: 12px 6px; font-size: 14.5px; color: var(--text); cursor: pointer;
+      border-bottom: 1px solid var(--border);
+    }
+    .picker-item:active { background: var(--surface-2); }
+    .picker-item.selected { color: var(--accent-solid); font-weight: 700; }
+    .picker-empty { padding: 24px 6px; color: var(--text-faint); font-size: 13.5px; text-align: center; }
+    .picker-custom-btn {
+      margin-top: 4px; text-align: left; background: none; border: none; font-family: inherit;
+      padding: 12px 6px; font-size: 14px; color: var(--accent-solid); font-weight: 600; cursor: pointer;
+    }
 
-  .blocked-list-wrap { margin-bottom: 20px; }
-  .blocked-user-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 8px 0; font-size: 13.5px; color: var(--text); }
-  .unblock-btn { background: none; border: 1px solid var(--border); color: var(--text-muted); font-size: 12px; font-weight: 600; padding: 5px 10px; border-radius: 999px; cursor: pointer; font-family: inherit; }
-  .tag button { background: none; border: none; padding: 0; }
-
-  #map { width: 100%; height: 200px; border-radius: 14px; margin-top: 10px; border: 1px solid var(--border); display: none; }
-</style>
+    .blocked-list-wrap { margin-bottom: 20px; }
+    .blocked-user-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 8px 0; font-size: 13.5px; color: var(--text); }
+    .unblock-btn { background: none; border: 1px solid var(--border); color: var(--text-muted); font-size: 12px; font-weight: 600; padding: 5px 10px; border-radius: 999px; cursor: pointer; font-family: inherit; }
+  </style>
 </head>
 <body>
 
@@ -625,13 +610,6 @@
               <div class="field"><input class="input" id="input-age" placeholder="Возраст"><span class="field-hint">напр. 25</span></div>
               <div class="field"><input class="input" id="input-height" placeholder="175"><span class="field-hint">Рост, см</span></div>
               <div class="field"><input class="input" id="input-weight" placeholder="65"><span class="field-hint">Вес, кг</span></div>
-            </div>
-            <div class="field" style="margin-top:10px;">
-              <span class="field-hint" style="margin-bottom:4px;">Пол</span>
-              <select id="input-gender">
-                <option value="Мужчина">Мужчина</option>
-                <option value="Женщина">Женщина</option>
-              </select>
             </div>
           </div>
 
@@ -722,10 +700,10 @@
             </button>
             <div class="chat-peer">
               <div class="peer-avatar-wrap">
-                <div class="peer-avatar" id="chatPeerAvatar">Е</div>
+                <div class="peer-avatar" id="chatPeerAvatar">?</div>
                 <div class="online-dot"></div>
               </div>
-              <span class="peer-name" id="chatPeerName">Елена</span>
+              <span class="peer-name" id="chatPeerName">Чат</span>
             </div>
             <button class="block-btn" id="blockBtn">
               <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/><path d="M5.5 5.5l13 13" stroke="currentColor" stroke-width="1.8"/></svg>
@@ -735,13 +713,13 @@
 
           <div class="chat-messages" id="chatMessagesEl"></div>
 
-          <input type="file" id="chatImageInput" accept="image/*" style="display:none">
+          <input type="file" id="chatMediaInput" accept="image/*,video/*" style="display:none">
 
           <div class="chat-input-bar" id="chatInputBar">
             <button class="tool-btn" title="Игры" id="toolBtnGames">
               <svg viewBox="0 0 24 24" fill="none"><rect x="4" y="4" width="16" height="16" rx="4" stroke="currentColor" stroke-width="1.6"/><circle cx="8.5" cy="8.5" r="1.2" fill="currentColor"/><circle cx="15.5" cy="8.5" r="1.2" fill="currentColor"/><circle cx="8.5" cy="15.5" r="1.2" fill="currentColor"/><circle cx="15.5" cy="15.5" r="1.2" fill="currentColor"/><circle cx="12" cy="12" r="1.2" fill="currentColor"/></svg>
             </button>
-            <button class="tool-btn" title="Отправить фото" id="toolBtnAttach">
+            <button class="tool-btn" title="Отправить медиа" id="toolBtnAttach">
               <svg viewBox="0 0 24 24" fill="none"><path d="M20 12.5 12.5 20a5 5 0 0 1-7-7L13 5.5a3.5 3.5 0 0 1 5 5L10.5 18a2 2 0 0 1-3-3L15 7.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </button>
             <input class="chat-input" id="chatInputEl" placeholder="Сообщение...">
@@ -817,36 +795,9 @@
     </div>
   </div>
 
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-app.js";
-  import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-analytics.js";
-  import { getFirestore, collection, addDoc, getDocs, query, where, limit, onSnapshot, doc, updateDoc } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore.js";
-
-  const firebaseConfig = {
-    apiKey: "AIzaSyCFl9_bOVzbtZwNPOxaNJb3BfW2XB0Jpgg",
-    authDomain: "dating-uz.firebaseapp.com",
-    projectId: "dating-uz",
-    storageBucket: "dating-uz.firebasestorage.app",
-    messagingSenderId: "1046578611265",
-    appId: "1:1046578611265:web:97597ee1a45dc4d192f2c0",
-    measurementId: "G-NM2EGJH6DV"
-  };
-
-  const app = initializeApp(firebaseConfig);
-  const analytics = getAnalytics(app);
-  const db = getFirestore(app);
-
-  window.db = db;
-  window.firebaseDocs = { collection, addDoc, getDocs, query, where, limit, onSnapshot, doc, updateDoc };
-
-  if (window.Telegram && window.Telegram.WebApp) {
-      window.Telegram.WebApp.ready();
-  }
-</script>
-
 <script>
 /* =========================================================
-   PAGE NAVIGATION & CORE SETUP
+   PAGE NAVIGATION
    ========================================================= */
 const pages = {
   search: document.getElementById('page-search'),
@@ -857,8 +808,15 @@ const pages = {
 const navKeyForPage = { search: 'search', profile: 'profile', chats: 'chats', chat: 'chats' };
 
 function goToPage(key) {
-  if (key !== 'chat' && typeof mediaRecorder !== 'undefined' && mediaRecorder && mediaRecorder.state === 'recording') {
-    finishRecording(true);
+  if (key !== 'chat') {
+    if (typeof mediaRecorder !== 'undefined' && mediaRecorder && mediaRecorder.state === 'recording') {
+      finishRecording(true);
+    }
+    if (activeChatUnsubscribe) {
+      activeChatUnsubscribe();
+      activeChatUnsubscribe = null;
+    }
+    currentChatId = null;
   }
   const navKey = navKeyForPage[key] || key;
   document.querySelectorAll('.nav-item[data-page-btn]').forEach(b => b.classList.remove('active'));
@@ -867,6 +825,7 @@ function goToPage(key) {
   Object.values(pages).forEach(p => p && p.classList.remove('active'));
   if (pages[key]) pages[key].classList.add('active');
   if (key === 'chats') renderChatsList();
+  if (key === 'search') loadAndRenderDeck();
 }
 document.querySelectorAll('[data-page-btn]').forEach(btn => {
   btn.addEventListener('click', () => goToPage(btn.dataset.pageBtn));
@@ -919,21 +878,20 @@ document.querySelectorAll('#input-age, #input-height, #input-weight').forEach(in
 /* =========================================================
    MY PROFILE STATE
    ========================================================= */
-let myProfile = JSON.parse(localStorage.getItem('app_user_data') || '{"name":"","gender":"Мужчина","photo":null}');
+const myProfile = { name: localStorage.getItem('user_name') || '', avatarPhoto: null, storyPhoto: null };
+if (myProfile.name) document.getElementById('input-name').value = myProfile.name;
 
 const avatarFileInput = document.getElementById('avatarFileInput');
 document.getElementById('avatarCamBtn').addEventListener('click', () => avatarFileInput.click());
 avatarFileInput.addEventListener('change', () => {
   const file = avatarFileInput.files[0];
   if (!file) return;
-  const reader = new FileReader();
-  reader.onload = (e) => {
-    myProfile.photo = e.target.result;
-    document.getElementById('avatarInner').innerHTML = '<img src="' + e.target.result + '" alt="avatar">';
+  compressImage(file, 400, 0.7, (dataUrl) => {
+    myProfile.avatarPhoto = dataUrl;
+    document.getElementById('avatarInner').innerHTML = '<img src="' + dataUrl + '" alt="avatar">';
     showToast('Фото профиля обновлено ✓');
     renderStories();
-  };
-  reader.readAsDataURL(file);
+  });
   avatarFileInput.value = '';
 });
 
@@ -941,24 +899,18 @@ const storyFileInput = document.getElementById('storyFileInput');
 storyFileInput.addEventListener('change', () => {
   const file = storyFileInput.files[0];
   if (!file) return;
-  const reader = new FileReader();
-  reader.onload = (e) => {
-    myProfile.storyPhoto = e.target.result;
+  compressImage(file, 800, 0.7, (dataUrl) => {
+    myProfile.storyPhoto = dataUrl;
     showToast('История опубликована ✓');
     renderStories();
-  };
-  reader.readAsDataURL(file);
+  });
   storyFileInput.value = '';
 });
 
 /* =========================================================
    STORIES ROW
    ========================================================= */
-const friendStories = [
-  { id: 'amina', name: 'Амина', hasStory: true, photo: null },
-  { id: 'diyor', name: 'Диёр', hasStory: true, photo: null },
-  { id: 'sabina', name: 'Сабина', hasStory: false, photo: null }
-];
+const friendStories = [];
 
 function renderStories() {
   const row = document.getElementById('storiesRow');
@@ -969,7 +921,7 @@ function renderStories() {
   mine.innerHTML =
     '<div class="story-ring' + (myProfile.storyPhoto ? ' has-story' : '') + '">' +
       '<div class="story-avatar' + (myProfile.storyPhoto ? '' : ' add') + '">' +
-        (myProfile.storyPhoto ? '<img src="' + myProfile.storyPhoto + '">' : (myProfile.photo ? '<img src="' + myProfile.photo + '">' : '+')) +
+        (myProfile.storyPhoto ? '<img src="' + myProfile.storyPhoto + '">' : (myProfile.avatarPhoto ? '<img src="' + myProfile.avatarPhoto + '">' : '+')) +
       '</div>' +
     '</div>' +
     '<span class="story-label">Моя</span>';
@@ -1010,7 +962,7 @@ function openStoryViewer(name, photo, initial) {
   const body = document.getElementById('storyViewerBody');
   body.innerHTML = photo
     ? '<img src="' + photo + '">'
-    : '<div class="sv-placeholder">Фото истории отсутствует ✨</div>';
+    : '<div class="sv-placeholder">Фото истории отсутствует, но профиль активен ✨</div>';
   storyProgress.classList.remove('run');
   void storyProgress.offsetWidth;
   storyProgress.classList.add('run');
@@ -1024,54 +976,29 @@ function closeStoryViewer() {
   clearTimeout(storyCloseTimer);
 }
 document.getElementById('storyViewerClose').addEventListener('click', closeStoryViewer);
+storyViewer.addEventListener('click', (e) => {
+  if (e.target === storyViewer || e.target.closest('.story-viewer-body')) closeStoryViewer();
+});
 
 /* =========================================================
-   DISCOVERY DECK & FIREBASE PROFILES
+   DISCOVERY DECK
    ========================================================= */
-let profiles = [
-  { id: 'elena',  name: 'Елена',  age: 23, city: 'Ташкент', height: 168, weight: 52, compat: 75, quick: 'Сходить на кофе', topic: 'Кино, Музыка', willMatch: true },
-  { id: 'amina',  name: 'Амина',  age: 25, city: 'Самарканд', height: 172, weight: 58, compat: 88, quick: 'Прогулка вечером', topic: 'Путешествия, Кофе', willMatch: true }
-];
+let profiles = [];
 let deckIndex = 0;
-
-async function loadFirebaseProfiles() {
-  if (!window.db) return;
-  try {
-    const { collection, getDocs, query, where, limit } = window.firebaseDocs;
-    const targetGender = (myProfile.gender === "Мужчина") ? "Женщина" : "Мужчина";
-    const q = query(collection(window.db, "users"), where("gender", "==", targetGender), limit(10));
-    const snap = await getDocs(q);
-    let loaded = [];
-    snap.forEach(d => {
-      let data = d.data();
-      loaded.push({
-        id: data.name || 'user',
-        name: data.name || 'Пользователь',
-        age: data.age || 22,
-        city: data.city || 'Ташкент',
-        height: data.height || 170,
-        weight: data.weight || 60,
-        compat: 85,
-        quick: 'Общение',
-        topic: data.hobbies || 'Разное',
-        photo: data.photo || null,
-        willMatch: true
-      });
-    });
-    if (loaded.length > 0) {
-      profiles = loaded;
-      deckIndex = 0;
-      renderDeck();
-    }
-  } catch(e) { console.error(e); }
-}
 
 function currentProfile() { return profiles[deckIndex % profiles.length]; }
 
+async function loadAndRenderDeck() {
+  if (window.loadProfilesFromFirebase) {
+    profiles = await window.loadProfilesFromFirebase();
+  }
+  renderDeck();
+}
+
 function renderDeck() {
   const wrap = document.getElementById('deckWrap');
-  if (profiles.length === 0) {
-    wrap.innerHTML = '<div class="empty-deck"><div class="big">Анкеты закончились</div>Загляните чуть позже — мы подбираем новых людей.</div>';
+  if (!profiles || profiles.length === 0) {
+    wrap.innerHTML = '<div class="empty-deck"><div class="big">Анкеты не найдены</div>Сохраните свой профиль или подождите появление новых пользователей.</div>';
     return;
   }
   const p = currentProfile();
@@ -1079,7 +1006,7 @@ function renderDeck() {
     '<div class="discover-card entering" id="activeCard">' +
       '<div class="card-photo' + (p.photo ? ' has-photo' : '') + '">' +
         '<div class="progress-segments"><span class="active"></span><span></span><span></span><span></span></div>' +
-        '<div class="compat-badge"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M13 2 3 14h7l-1 8 11-14h-7l1-6Z"/></svg>' + (p.compat || 80) + '%</div>' +
+        '<div class="compat-badge"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M13 2 3 14h7l-1 8 11-14h-7l1-6Z"/></svg>' + p.compat + '%</div>' +
         '<div class="photo-scrim"></div>' +
         (p.photo ? '<img class="real-photo" src="' + p.photo + '">' : '') +
         '<svg class="silhouette" viewBox="0 0 24 24" fill="none"><path d="M12 12a4.5 4.5 0 1 0 0-9 4.5 4.5 0 0 0 0 9Z" stroke="currentColor" stroke-width="1.4"/><path d="M4 20c1.6-3.6 4.7-5.5 8-5.5s6.4 1.9 8 5.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>' +
@@ -1087,8 +1014,8 @@ function renderDeck() {
       '<div class="card-info">' +
         '<div class="name-row"><span class="name">' + p.name + '</span><span class="age">' + p.age + '</span></div>' +
         '<div class="meta-row"><svg viewBox="0 0 24 24" fill="none"><path d="M12 21s-7-6.1-7-11a7 7 0 1 1 14 0c0 4.9-7 11-7 11Z" stroke="currentColor" stroke-width="1.6"/><circle cx="12" cy="10" r="2.4" stroke="currentColor" stroke-width="1.6"/></svg>' +
-          p.city + ' \u00b7 Рост ' + p.height + ' см</div>' +
-        '<div class="info-chip">\u26a1 ' + p.quick + '</div>' +
+          p.city + ' \u00b7 Рост ' + p.height + ' см \u00b7 Вес ' + p.weight + ' кг</div>' +
+        '<div class="info-chip">\u26a1 Быстро: ' + p.quick + '</div>' +
         '<div class="interest-line"><svg viewBox="0 0 24 24" fill="none"><path d="M4 6h16M4 12h10M4 18h13" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>Тема: ' + p.topic + '</div>' +
         '<div class="action-row">' +
           '<button class="action-btn pass" id="btnPass"><svg viewBox="0 0 24 24" fill="none"><path d="M7 15V6a1 1 0 0 1 1-1h1a2 2 0 0 1 2 2l1 3h6a2 2 0 0 1 2 2l-1.4 5.6A2 2 0 0 1 15.7 19H10a3 3 0 0 1-3-3v-1Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>Pass</button>' +
@@ -1108,6 +1035,7 @@ function renderDeck() {
 }
 
 function nextInDeck(action) {
+  if (profiles.length === 0) return;
   const p = currentProfile();
   const card = document.getElementById('activeCard');
   if (card) { card.classList.remove('entering'); card.classList.add('leaving'); }
@@ -1130,12 +1058,14 @@ let matchProfileId = null;
 function showMatch(p) {
   matchProfileId = p.id;
   document.getElementById('matchAvMe').textContent = (myProfile.name || 'Я').slice(0,1).toUpperCase();
-  if (myProfile.photo) document.getElementById('matchAvMe').innerHTML = '<img src="' + myProfile.photo + '">';
+  if (myProfile.avatarPhoto) document.getElementById('matchAvMe').innerHTML = '<img src="' + myProfile.avatarPhoto + '">';
   document.getElementById('matchAvThem').textContent = p.name.slice(0,1);
   document.getElementById('matchSub').textContent = 'Вы и ' + p.name + ' понравились друг другу';
   matchOverlay.classList.add('show');
 }
-document.getElementById('matchContinueBtn').addEventListener('click', () => matchOverlay.classList.remove('show'));
+document.getElementById('matchContinueBtn').addEventListener('click', () => {
+  matchOverlay.classList.remove('show');
+});
 document.getElementById('matchWriteBtn').addEventListener('click', () => {
   matchOverlay.classList.remove('show');
   if (matchProfileId) {
@@ -1145,27 +1075,42 @@ document.getElementById('matchWriteBtn').addEventListener('click', () => {
 });
 
 /* =========================================================
-   CHATS & MESSAGING (FIREBASE SUPPORT)
+   CHATS STATE & LOGIC
    ========================================================= */
 const chats = {};
 let currentChatId = null;
-let unsubscribeChatListener = null;
+let activeChatUnsubscribe = null;
 
 function ensureChat(profileOrId) {
   const p = typeof profileOrId === 'string' ? profiles.find(pr => pr.id === profileOrId) : profileOrId;
   if (!p) return null;
   if (!chats[p.id]) {
-    chats[p.id] = { id: p.id, name: p.name, initial: p.name.slice(0,1), photo: p.photo || null, messages: [] };
+    chats[p.id] = { id: p.id, name: p.name, initial: p.name.slice(0,1), photo: p.photo || null, blocked: false, messages: [], unreadCount: 0 };
   }
   return chats[p.id];
 }
-ensureChat('elena');
 
-function renderChatsList() {
+async function renderChatsList() {
   const body = document.getElementById('chatsListBody');
+  
+  if (window.loadAllUserChats) {
+    const loadedChats = await window.loadAllUserChats(myProfile.name || 'Я');
+    loadedChats.forEach(c => {
+      chats[c.id] = {
+        id: c.id,
+        name: c.name,
+        initial: c.name.slice(0,1),
+        photo: c.photo || null,
+        blocked: false,
+        messages: c.messages,
+        unreadCount: c.unreadCount
+      };
+    });
+  }
+
   const ids = Object.keys(chats);
   if (ids.length === 0) {
-    body.innerHTML = '<div class="chats-empty">У вас пока нет чатов. Поставите лайк на странице «Поиск» 💌</div>';
+    body.innerHTML = '<div class="chats-empty">У вас пока нет чатов. Поставьте лайк понравившейся анкете на странице «Поиск» 💌</div>';
     return;
   }
   body.innerHTML = '';
@@ -1176,16 +1121,23 @@ function renderChatsList() {
     if (last) {
       const prefix = last.dir === 'out' ? 'Вы: ' : '';
       if (last.type === 'image') previewText = prefix + '📷 Фото';
+      else if (last.type === 'video') previewText = prefix + '🎥 Видео';
       else if (last.type === 'voice') previewText = prefix + '🎤 Голосовое сообщение';
       else previewText = prefix + last.text;
     }
+
+    const unreadHtml = c.unreadCount > 0 ? '<span class="unread-badge">' + c.unreadCount + '</span>' : '';
+
     const item = document.createElement('button');
     item.className = 'chat-list-item';
     item.innerHTML =
       '<div class="chat-avatar">' + (c.photo ? '<img src="' + c.photo + '">' : c.initial) + '</div>' +
       '<div class="chat-list-main">' +
         '<div class="chat-list-top"><span class="chat-list-name">' + c.name + '</span><span class="chat-list-time">сейчас</span></div>' +
-        '<div class="chat-list-preview">' + previewText + '</div>' +
+        '<div class="chat-list-bottom">' +
+          '<span class="chat-list-preview">' + previewText + '</span>' +
+          unreadHtml +
+        '</div>' +
       '</div>';
     item.addEventListener('click', () => { openChat(id); goToPage('chat'); });
     body.appendChild(item);
@@ -1198,21 +1150,101 @@ function formatTime(sec) {
   return m + ':' + (s < 10 ? '0' : '') + s;
 }
 
-const checkSvg = '<span class="msg-meta"><svg viewBox="0 0 24 24" fill="none"><path d="M1 12l4 4L14 7M9 12l4 4L22 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>';
+// SVG Галочки: Выполнено (1 серыми), Доставлено (2 серыми), Прочитано (2 синими)
+function getStatusSvg(m) {
+  if (m.dir !== 'out') return '';
+  if (m.isRead) {
+    return '<span class="msg-meta read"><svg viewBox="0 0 24 24" fill="none"><path d="M1 12l4 4L14 7M9 12l4 4L22 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>';
+  } else {
+    return '<span class="msg-meta"><svg viewBox="0 0 24 24" fill="none"><path d="M1 12l4 4L14 7M9 12l4 4L22 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>';
+  }
+}
 
-function openChat(id) {
-  currentChatId = id;
-  const c = chats[id];
-  document.getElementById('chatPeerName').textContent = c.name;
-  document.getElementById('chatPeerAvatar').innerHTML = c.photo ? '<img src="' + c.photo + '">' : c.initial;
-  renderChatMessages();
-  listenFirebaseMessages(c.name);
+let activeVoiceAudio = null;
+let activeVoicePlayBtn = null;
+let activeVoiceFill = null;
+let activeVoiceTimeEl = null;
+
+function stopActiveVoice() {
+  if (activeVoiceAudio) { activeVoiceAudio.pause(); }
+  if (activeVoicePlayBtn) setPlayIcon(activeVoicePlayBtn, true);
+  activeVoiceAudio = null; activeVoicePlayBtn = null; activeVoiceFill = null; activeVoiceTimeEl = null;
+}
+function setPlayIcon(btn, showPlay) {
+  btn.innerHTML = showPlay
+    ? '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7Z"/></svg>'
+    : '<svg viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg>';
+}
+
+function buildVoiceBubble(m) {
+  const wrap = document.createElement('div');
+  wrap.className = 'voice-msg';
+  const playBtn = document.createElement('button');
+  playBtn.className = 'voice-play-btn';
+  setPlayIcon(playBtn, true);
+  const track = document.createElement('div');
+  track.className = 'voice-track';
+  const bar = document.createElement('div');
+  bar.className = 'voice-bar';
+  const fill = document.createElement('div');
+  fill.className = 'voice-bar-fill';
+  bar.appendChild(fill);
+  const timeEl = document.createElement('span');
+  timeEl.className = 'voice-time';
+  timeEl.textContent = formatTime(m.duration);
+  track.appendChild(bar);
+  track.appendChild(timeEl);
+  wrap.appendChild(playBtn);
+  wrap.appendChild(track);
+
+  playBtn.addEventListener('click', () => {
+    if (activeVoicePlayBtn === playBtn && activeVoiceAudio && !activeVoiceAudio.paused) {
+      stopActiveVoice();
+      return;
+    }
+    stopActiveVoice();
+
+    if (!m.audio) {
+      showToast('Запись недоступна');
+      return;
+    }
+
+    const audio = new Audio(m.audio);
+    activeVoiceAudio = audio;
+    activeVoicePlayBtn = playBtn;
+    activeVoiceFill = fill;
+    activeVoiceTimeEl = timeEl;
+    setPlayIcon(playBtn, false);
+
+    audio.addEventListener('timeupdate', () => {
+      if (audio.duration && !isNaN(audio.duration)) {
+        fill.style.width = (audio.currentTime / audio.duration * 100) + '%';
+        timeEl.textContent = formatTime(audio.duration - audio.currentTime);
+      }
+    });
+
+    audio.addEventListener('ended', () => {
+      fill.style.width = '0%';
+      timeEl.textContent = formatTime(m.duration);
+      setPlayIcon(playBtn, true);
+      if (activeVoiceAudio === audio) { activeVoiceAudio = null; activeVoicePlayBtn = null; }
+    });
+
+    audio.play().catch((err) => {
+      console.error('Playback error:', err);
+      showToast('Ошибка воспроизведения');
+      setPlayIcon(playBtn, true);
+    });
+  });
+
+  return wrap;
 }
 
 function renderChatMessages() {
+  if (!currentChatId || !chats[currentChatId]) return;
   const c = chats[currentChatId];
-  if (!c) return;
   const wrap = document.getElementById('chatMessagesEl');
+  stopActiveVoice();
   wrap.innerHTML = '<div class="day-divider">Сегодня</div>';
   c.messages.forEach(m => {
     const row = document.createElement('div');
@@ -1225,19 +1257,26 @@ function renderChatMessages() {
       const img = document.createElement('img');
       img.className = 'msg-photo';
       img.src = m.photo;
+      img.addEventListener('click', () => openMediaLightbox(m.photo, 'image'));
       bubble.appendChild(img);
+      bubble.insertAdjacentHTML('beforeend', getStatusSvg(m));
+    } else if (m.type === 'video') {
+      bubble.classList.add('video-bubble');
+      const video = document.createElement('video');
+      video.className = 'msg-video';
+      video.src = m.video;
+      video.controls = true;
+      bubble.appendChild(video);
+      bubble.insertAdjacentHTML('beforeend', getStatusSvg(m));
     } else if (m.type === 'voice') {
-      const audio = document.createElement('audio');
-      audio.controls = true;
-      audio.src = m.audio;
-      audio.style.maxWidth = '180px';
-      bubble.appendChild(audio);
+      bubble.appendChild(buildVoiceBubble(m));
+      bubble.insertAdjacentHTML('beforeend', getStatusSvg(m));
     } else {
       const text = document.createElement('span');
       text.className = 'msg-text';
       text.textContent = m.text;
       bubble.appendChild(text);
-      if (m.dir === 'out') bubble.insertAdjacentHTML('beforeend', checkSvg);
+      bubble.insertAdjacentHTML('beforeend', getStatusSvg(m));
     }
 
     row.appendChild(bubble);
@@ -1246,32 +1285,42 @@ function renderChatMessages() {
   wrap.scrollTop = wrap.scrollHeight;
 }
 
-async function listenFirebaseMessages(partnerName) {
-  if (!window.db || !myProfile.name) return;
-  if (unsubscribeChatListener) unsubscribeChatListener();
+function openMediaLightbox(url, type) {
+  document.getElementById('storyViewerName').textContent = type === 'video' ? 'Видео' : 'Фото';
+  document.getElementById('storyViewerAvatar').textContent = type === 'video' ? '🎥' : '📷';
+  document.getElementById('storyViewerBody').innerHTML = type === 'video' 
+    ? '<video src="' + url + '" controls autoplay style="max-width:100%;max-height:100%;"></video>'
+    : '<img src="' + url + '">';
+  storyProgress.classList.remove('run');
+  storyViewer.classList.add('show');
+  clearTimeout(storyCloseTimer);
+}
 
-  const { collection, query, onSnapshot } = window.firebaseDocs;
-  const q = query(collection(window.db, "messages"));
+function openChat(id) {
+  currentChatId = id;
+  const c = chats[id];
+  if (!c) return;
 
-  unsubscribeChatListener = onSnapshot(q, (snapshot) => {
-    let firebaseMsgs = [];
-    snapshot.forEach(docSnap => {
-      let msg = docSnap.data();
-      if ((msg.sender === myProfile.name && msg.receiver === partnerName) ||
-          (msg.sender === partnerName && msg.receiver === myProfile.name)) {
-        firebaseMsgs.push({
-          dir: msg.sender === myProfile.name ? 'out' : 'in',
-          type: msg.isHtml ? 'image' : 'text',
-          text: msg.text,
-          photo: msg.isHtml ? msg.text.match(/src="([^"]+)"/)?.[1] : null
-        });
-      }
-    });
-    if (firebaseMsgs.length > 0) {
-      chats[currentChatId].messages = firebaseMsgs;
+  document.getElementById('chatPeerName').textContent = c.name;
+  document.getElementById('chatPeerAvatar').innerHTML = c.photo ? '<img src="' + c.photo + '">' : c.initial;
+
+  if (activeChatUnsubscribe) activeChatUnsubscribe();
+
+  if (window.listenFirebaseChat) {
+    activeChatUnsubscribe = window.listenFirebaseChat(myProfile.name || 'Я', c.name, (newMessages) => {
+      c.messages = newMessages.map(m => ({
+        dir: m.sender === (myProfile.name || 'Я') ? 'out' : 'in',
+        type: m.type || 'text',
+        text: m.text,
+        photo: m.photo,
+        video: m.video,
+        audio: m.audio,
+        duration: m.duration,
+        isRead: m.isRead
+      }));
       renderChatMessages();
-    }
-  });
+    });
+  }
 }
 
 const chatInputEl = document.getElementById('chatInputEl');
@@ -1279,150 +1328,576 @@ async function sendMessage() {
   const text = chatInputEl.value.trim();
   if (!text || !currentChatId) return;
   const c = chats[currentChatId];
-  c.messages.push({ dir: 'out', type: 'text', text });
-  renderChatMessages();
-  chatInputEl.value = '';
 
-  if (window.db && myProfile.name) {
-    try {
-      const { collection, addDoc } = window.firebaseDocs;
-      await addDoc(collection(window.db, "messages"), {
-        sender: myProfile.name,
-        receiver: c.name,
-        text: text,
-        timestamp: Date.now()
-      });
-    } catch(e) { console.error(e); }
+  chatInputEl.value = '';
+  
+  if (window.sendFirebaseMessage) {
+    await window.sendFirebaseMessage(myProfile.name || 'Я', c.name, text, 'text');
   }
 }
-
 document.getElementById('sendBtnEl').addEventListener('click', sendMessage);
 chatInputEl.addEventListener('keydown', (e) => { if (e.key === 'Enter') sendMessage(); });
+document.getElementById('toolBtnGames').addEventListener('click', () => showToast('Мини-игры скоро появятся 🎮'));
 
-/* Voice recording logic */
+/* =========================================================
+   MEDIA ATTACHMENTS (Оптимизация файлов)
+   ========================================================= */
+function compressImage(file, maxWidth, quality, callback) {
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      let w = img.width, h = img.height;
+      if (w > maxWidth) {
+        h = Math.round((h * maxWidth) / w);
+        w = maxWidth;
+      }
+      canvas.width = w; canvas.height = h;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, w, h);
+      callback(canvas.toDataURL('image/jpeg', quality));
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+const chatMediaInput = document.getElementById('chatMediaInput');
+document.getElementById('toolBtnAttach').addEventListener('click', () => {
+  if (!currentChatId) { showToast('Откройте чат, чтобы отправить медиа'); return; }
+  chatMediaInput.click();
+});
+chatMediaInput.addEventListener('change', () => {
+  const file = chatMediaInput.files[0];
+  if (!file || !currentChatId) return;
+  const c = chats[currentChatId];
+
+  if (file.type.startsWith('image/')) {
+    showToast('Сжатие и отправка...');
+    compressImage(file, 800, 0.65, async (compressedBase64) => {
+      if (window.sendFirebaseMessage) {
+        await window.sendFirebaseMessage(myProfile.name || 'Я', c.name, '', 'image', { photo: compressedBase64 });
+        showToast('Фото отправлено ✓');
+      }
+    });
+  } else if (file.type.startsWith('video/')) {
+    if (file.size > 15 * 1024 * 1024) {
+      showToast('Видео слишком большое (макс. 15 МБ)');
+      return;
+    }
+    showToast('Загрузка видео...');
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+      if (window.sendFirebaseMessage) {
+        await window.sendFirebaseMessage(myProfile.name || 'Я', c.name, '', 'video', { video: e.target.result });
+        showToast('Видео отправлено ✓');
+      }
+    };
+    reader.readAsDataURL(file);
+  }
+  chatMediaInput.value = '';
+});
+
+/* =========================================================
+   VOICE RECORDER
+   ========================================================= */
+const recordingBar = document.getElementById('recordingBar');
+const recordingTimeEl = document.getElementById('recordingTime');
+const toolBtnMic = document.getElementById('toolBtnMic');
 let mediaRecorder = null;
 let recordedChunks = [];
 let recordStream = null;
+let recordStartTs = 0;
+let recordTimerInt = null;
+let recordCancelled = false;
+
+function updateRecordingTime() {
+  const sec = (Date.now() - recordStartTs) / 1000;
+  recordingTimeEl.textContent = formatTime(sec);
+}
 
 async function startRecording() {
-  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-    showToast('Микрофон не поддерживается');
+  if (!currentChatId) { showToast('Откройте чат, чтобы записать голосовое'); return; }
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia || typeof MediaRecorder === 'undefined') {
+    showToast('Запись голоса не поддерживается в этом браузере');
     return;
   }
   try {
     recordStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+  } catch (err) {
+    showToast('Нет доступа к микрофону');
+    return;
+  }
+  recordedChunks = [];
+  recordCancelled = false;
+
+  let mimeType = 'audio/webm;codecs=opus';
+  if (!MediaRecorder.isTypeSupported(mimeType)) mimeType = 'audio/webm';
+  if (!MediaRecorder.isTypeSupported(mimeType)) mimeType = 'audio/mp4';
+
+  try {
+    mediaRecorder = new MediaRecorder(recordStream, { mimeType, audioBitsPerSecond: 24000 });
+  } catch(e) {
     mediaRecorder = new MediaRecorder(recordStream);
-    recordedChunks = [];
-    mediaRecorder.ondataavailable = (e) => recordedChunks.push(e.data);
-    mediaRecorder.onstop = () => {
-      const blob = new Blob(recordedChunks, { type: 'audio/webm' });
-      const reader = new FileReader();
-      reader.readAsDataURL(blob);
-      reader.onloadend = () => {
-        chats[currentChatId].messages.push({ dir: 'out', type: 'voice', audio: reader.result });
-        renderChatMessages();
-      };
+  }
+
+  mediaRecorder.ondataavailable = (e) => {
+    if (e.data && e.data.size > 0) recordedChunks.push(e.data);
+  };
+
+  mediaRecorder.onstop = () => {
+    recordStream.getTracks().forEach(t => t.stop());
+    recordStream = null;
+    if (recordCancelled) return;
+    const duration = (Date.now() - recordStartTs) / 1000;
+    if (duration < 0.6 || recordedChunks.length === 0) {
+      showToast('Слишком короткая запись');
+      return;
+    }
+
+    const blob = new Blob(recordedChunks, { type: mediaRecorder.mimeType || 'audio/webm' });
+
+    const reader = new FileReader();
+    reader.onloadend = async () => {
+      const base64Audio = reader.result;
+      if (currentChatId && window.sendFirebaseMessage) {
+        const c = chats[currentChatId];
+        await window.sendFirebaseMessage(myProfile.name || 'Я', c.name, '', 'voice', { audio: base64Audio, duration });
+        showToast('Голосовое отправлено ✓');
+      }
     };
-    mediaRecorder.start();
-    document.getElementById('recordingBar').classList.add('active');
-  } catch(e) { showToast('Ошибка микрофона'); }
+    reader.readAsDataURL(blob);
+  };
+
+  mediaRecorder.start();
+  recordStartTs = Date.now();
+  recordingTimeEl.textContent = '0:00';
+  recordingBar.classList.add('active');
+  document.getElementById('chatInputBar').style.display = 'none';
+  toolBtnMic.classList.add('recording-active');
+  recordTimerInt = setInterval(updateRecordingTime, 200);
 }
 
-function finishRecording() {
-  if (mediaRecorder && mediaRecorder.state !== 'inactive') mediaRecorder.stop();
-  if (recordStream) recordStream.getTracks().forEach(t => t.stop());
-  document.getElementById('recordingBar').classList.remove('active');
+function finishRecording(cancel) {
+  recordCancelled = !!cancel;
+  clearInterval(recordTimerInt);
+  recordingBar.classList.remove('active');
+  document.getElementById('chatInputBar').style.display = '';
+  toolBtnMic.classList.remove('recording-active');
+  if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+    mediaRecorder.stop();
+  } else if (recordStream) {
+    recordStream.getTracks().forEach(t => t.stop());
+    recordStream = null;
+  }
 }
 
-document.getElementById('toolBtnMic').addEventListener('click', startRecording);
-document.getElementById('recSendBtn').addEventListener('click', finishRecording);
+toolBtnMic.addEventListener('click', () => {
+  if (mediaRecorder && mediaRecorder.state === 'recording') {
+    finishRecording(false);
+  } else {
+    startRecording();
+  }
+});
+document.getElementById('recSendBtn').addEventListener('click', () => finishRecording(false));
+document.getElementById('recCancelBtn').addEventListener('click', () => finishRecording(true));
 
-/* =========================================================
-   SAVING PROFILE TO FIREBASE & LOCALSTORAGE
-   ========================================================= */
+const blockedUsers = [];
+document.getElementById('blockBtn').addEventListener('click', () => {
+  if (!currentChatId) return;
+  const c = chats[currentChatId];
+  if (!confirm('Заблокировать ' + c.name + '? Переписка будет удалена.')) return;
+  blockedUsers.push(c.name);
+  delete chats[currentChatId];
+  currentChatId = null;
+  renderBlockedList();
+  showToast('Пользователь заблокирован');
+  goToPage('chats');
+});
+
+function renderBlockedList() {
+  const wrap = document.getElementById('blockedListWrap');
+  if (blockedUsers.length === 0) {
+    wrap.innerHTML = '<div class="blocked-empty" id="blockedEmpty">Список заблокированных пуст</div>';
+    return;
+  }
+  wrap.innerHTML = '<div class="blocked-list-wrap">' + blockedUsers.map((name, i) =>
+    '<div class="blocked-user-row"><span>' + name + '</span><button class="unblock-btn" data-unblock-idx="' + i + '">Разблокировать</button></div>'
+  ).join('') + '</div>';
+  wrap.querySelectorAll('[data-unblock-idx]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const idx = +btn.dataset.unblockIdx;
+      showToast(blockedUsers[idx] + ' разблокирован(а)');
+      blockedUsers.splice(idx, 1);
+      renderBlockedList();
+    });
+  });
+}
+
+const tagWrap = document.getElementById('tagWrap');
+tagWrap.addEventListener('click', (e) => {
+  const removeBtn = e.target.closest('.tag button');
+  if (removeBtn) {
+    removeBtn.closest('.tag').remove();
+  }
+});
+document.getElementById('tagAddBtn').addEventListener('click', () => {
+  const val = prompt('Новый интерес / тема для разговора:');
+  if (!val || !val.trim()) return;
+  const tag = document.createElement('span');
+  tag.className = 'tag';
+  tag.innerHTML = val.trim() + ' <button>✕</button>';
+  document.getElementById('tagAddBtn').insertAdjacentElement('beforebegin', tag);
+});
+
+/* ---- Список всех стран ---- */
+const COUNTRIES = [
+  'Австралия','Австрия','Азербайджан','Албания','Алжир','Ангола','Андорра','Аргентина','Армения',
+  'Афганистан','Багамы','Бангладеш','Барбадос','Бахрейн','Беларусь','Белиз','Бельгия','Бенин',
+  'Болгария','Боливия','Босния и Герцеговина','Ботсвана','Бразилия','Бруней','Буркина-Фасо','Бурунди',
+  'Бутан','Вануату','Великобритания','Венгрия','Венесуэла','Вьетнам','Габон','Гаити','Гайана','Гамбия',
+  'Гана','Гватемала','Гвинея','Гвинея-Бисау','Германия','Гондурас','Гренада','Греция','Грузия','Дания',
+  'Джибути','Доминика','Доминиканская Республика','Египет','Замбия','Зимбабве','Израиль','Индия',
+  'Индонезия','Иордания','Ирак','Иран','Ирландия','Исландия','Испания','Италия','Йемен','Кабо-Верде',
+  'Казахстан','Камбоджа','Камерун','Канада','Катар','Кения','Кипр','Кыргызстан','Китай','Колумбия',
+  'Коморы','Конго','Коста-Рика','Кот-д’Ивуар','Куба','Кувейт','Лаос','Латвия','Лесото','Либерия',
+  'Ливан','Ливия','Литва','Лихтенштейн','Люксембург','Маврикий','Мавритания','Мадагаскар','Малави',
+  'Малайзия','Мали','Мальдивы','Мальта','Марокко','Мексика','Мозамбик','Молдова','Монако','Монголия',
+  'Мьянма','Намибия','Непал','Нигер','Нигерия','Нидерланды','Никарагуа','Новая Зеландия','Норвегия',
+  'ОАЭ','Оман','Пакистан','Панама','Папуа — Новая Гвинея','Парагвай','Перу','Польша','Португалия',
+  'Россия','Руанда','Румыния','Сальвадор','Самоа','Сан-Марино','Саудовская Аравия','Свазиленд',
+  'Сенегал','Сербия','Сингапур','Сирия','Словакия','Словения','США','Сомали','Судан','Суринам',
+  'Сьерра-Леоне','Таджикистан','Таиланд','Танзания','Того','Тонга','Тринидад и Тобаго','Тунис',
+  'Туркменистан','Турция','Уганда','Узбекистан','Украина','Уругвай','Фиджи','Филиппины','Финляндия',
+  'Франция','Хорватия','ЦАР','Чад','Черногория','Чехия','Чили','Швейцария','Швеция','Шри-Ланка',
+  'Эквадор','Эстония','Эфиопия','ЮАР','Южная Корея','Ямайка','Япония'
+].sort((a, b) => a.localeCompare(b, 'ru'));
+
+const CITIES_BY_COUNTRY = {
+  'Узбекистан': ['Андижан','Бухара','Гулистан','Джизак','Карши','Коканд','Намаган','Навои','Нукус','Самарканд','Термез','Ташкент','Ургенч','Фергана'],
+  'Казахстан': ['Актобе','Алматы','Астана','Атырау','Караганда','Костанай','Кызылорда','Павлодар','Тараз','Шымкент'],
+  'Кыргызстан': ['Бишкек','Джалал-Абад','Каракол','Ош','Талас'],
+  'Таджикистан': ['Бохтар','Душанбе','Куляб','Худжанд'],
+  'Туркменистан': ['Ашхабад','Дашогуз','Мары','Туркменабад'],
+  'Россия': ['Екатеринбург','Казань','Краснодар','Москва','Нижний Новгород','Новосибирск','Омск','Ростов-на-Дону','Самара','Санкт-Петербург','Челябинск'],
+  'США': ['Бостон','Вашингтон','Лос-Анджелес','Майами','Нью-Йорк','Сан-Франциско','Чикаго'],
+  'Германия': ['Берлин','Гамбург','Дюссельдорф','Кёльн','Мюнхен','Франкфурт'],
+  'Турция': ['Анкара','Анталья','Бурса','Измир','Стамбул'],
+  'ОАЭ': ['Абу-Даби','Дубай','Шарджа']
+};
+function citiesFor(country) {
+  return (CITIES_BY_COUNTRY[country] || []).slice().sort((a, b) => a.localeCompare(b, 'ru'));
+}
+
+const pickerOverlay = document.getElementById('pickerOverlay');
+const pickerTitle = document.getElementById('pickerTitle');
+const pickerSearch = document.getElementById('pickerSearch');
+const pickerList = document.getElementById('pickerList');
+let pickerState = { items: [], current: '', onSelect: null };
+
+function renderPickerList(query) {
+  const q = (query || '').trim().toLowerCase();
+  const filtered = q ? pickerState.items.filter(i => i.toLowerCase().includes(q)) : pickerState.items;
+  pickerList.innerHTML = '';
+  if (filtered.length === 0) {
+    pickerList.innerHTML = '<div class="picker-empty">Ничего не найдено</div>';
+    if (q) {
+      const customBtn = document.createElement('button');
+      customBtn.className = 'picker-custom-btn';
+      customBtn.textContent = 'Использовать «' + query.trim() + '»';
+      customBtn.addEventListener('click', () => { pickerState.onSelect(query.trim()); closePicker(); });
+      pickerList.appendChild(customBtn);
+    }
+    return;
+  }
+  filtered.forEach(item => {
+    const btn = document.createElement('button');
+    btn.className = 'picker-item' + (item === pickerState.current ? ' selected' : '');
+    btn.textContent = item;
+    btn.addEventListener('click', () => { pickerState.onSelect(item); closePicker(); });
+    pickerList.appendChild(btn);
+  });
+}
+
+function openPicker(title, items, current, onSelect) {
+  pickerTitle.textContent = title;
+  pickerState = { items, current, onSelect };
+  pickerSearch.value = '';
+  renderPickerList('');
+  pickerOverlay.classList.add('show');
+  setTimeout(() => pickerSearch.focus(), 50);
+}
+function closePicker() { pickerOverlay.classList.remove('show'); }
+document.getElementById('pickerCloseBtn').addEventListener('click', closePicker);
+pickerOverlay.addEventListener('click', (e) => { if (e.target === pickerOverlay) closePicker(); });
+pickerSearch.addEventListener('input', () => renderPickerList(pickerSearch.value));
+
+document.getElementById('selectCountry').addEventListener('click', () => {
+  const current = document.getElementById('selectCountryLabel').textContent;
+  openPicker('Страна', COUNTRIES, current, (country) => {
+    document.getElementById('selectCountryLabel').textContent = country;
+    const cities = citiesFor(country);
+    document.getElementById('selectCityLabel').textContent = cities.length ? cities[0] : 'Выберите город';
+  });
+});
+document.getElementById('selectCity').addEventListener('click', () => {
+  const country = document.getElementById('selectCountryLabel').textContent;
+  const current = document.getElementById('selectCityLabel').textContent;
+  const cities = citiesFor(country);
+  openPicker('Город' + (cities.length ? '' : ' — начните вводить'), cities, current, (city) => {
+    document.getElementById('selectCityLabel').textContent = city;
+  });
+});
+
 const saveProfileBtn = document.getElementById('saveProfileBtn');
+let saveBtnResetTimer = null;
 
-saveProfileBtn.addEventListener('click', async () => {
+function setSaveBtnState(state, label) {
+  saveProfileBtn.classList.remove('is-success', 'is-error');
+  if (state) saveProfileBtn.classList.add(state);
+  saveProfileBtn.textContent = label;
+  clearTimeout(saveBtnResetTimer);
+  saveBtnResetTimer = setTimeout(() => {
+    saveProfileBtn.classList.remove('is-success', 'is-error');
+    saveProfileBtn.textContent = 'Сохранить профиль';
+  }, 2400);
+}
+
+function validateProfileForm() {
   const name = document.getElementById('input-name').value.trim();
   const age = document.getElementById('input-age').value.trim();
   const height = document.getElementById('input-height').value.trim();
   const weight = document.getElementById('input-weight').value.trim();
-  const gender = document.getElementById('input-gender').value;
 
-  if (!name || !age) {
-    showToast('Укажите имя и возраст');
+  if (!name) return { ok: false, reason: 'Укажите имя' };
+  const ageNum = +age, heightNum = +height, weightNum = +weight;
+  if (!age || ageNum < 18 || ageNum > 99) return { ok: false, reason: 'Некорректный возраст (18–99)' };
+  if (!height || heightNum < 100 || heightNum > 230) return { ok: false, reason: 'Некорректный рост' };
+  if (!weight || weightNum < 30 || weightNum > 250) return { ok: false, reason: 'Некорректный вес' };
+  return { ok: true, name, age, height, weight };
+}
+
+/* =========================================================
+   INITIAL RENDER & LISTENERS
+   ========================================================= */
+renderStories();
+renderChatsList();
+renderBlockedList();
+
+saveProfileBtn.addEventListener('click', async () => {
+  const result = validateProfileForm();
+  if (!result.ok) {
+    showToast('Не удалось сохранить: ' + result.reason);
+    setSaveBtnState('is-error', 'Не удалось сохранить');
     return;
   }
 
-  myProfile.name = name;
-  myProfile.age = Number(age);
-  myProfile.height = Number(height);
-  myProfile.weight = Number(weight);
-  myProfile.gender = gender;
+  myProfile.name = result.name;
+  myProfile.age = result.age;
+  myProfile.height = result.height;
+  myProfile.weight = result.weight;
+  localStorage.setItem('user_name', result.name);
+
+  const goal = document.querySelector('input[name="goal"]:checked');
+  const mode = document.querySelector('input[name="mode"]:checked');
+  const tags = Array.from(document.querySelectorAll('#tagWrap .tag')).map(t => t.firstChild.textContent.trim());
+  myProfile.goal = goal ? goal.closest('label').textContent.trim() : null;
+  myProfile.mode = mode ? mode.id : null;
+  myProfile.tags = tags;
+  myProfile.searchAgeRange = getAgeRange();
+  myProfile.searchHeightRange = getHeightRange();
   myProfile.country = document.getElementById('selectCountryLabel').textContent;
   myProfile.city = document.getElementById('selectCityLabel').textContent;
 
-  localStorage.setItem('app_user_data', JSON.stringify(myProfile));
-
-  if (window.db) {
-    try {
-      const { collection, addDoc } = window.firebaseDocs;
-      await addDoc(collection(window.db, "users"), myProfile);
-    } catch(e) { console.error("Firebase err:", e); }
+  if (window.saveProfileToFirebase) {
+    await window.saveProfileToFirebase(myProfile);
   }
 
+  renderStories();
   showToast('Профиль сохранён ✓');
-  loadFirebaseProfiles();
+  setSaveBtnState('is-success', 'Сохранено ✓');
+  loadAndRenderDeck();
 });
+</script>
 
-/* =========================================================
-   COUNTRY & CITY PICKER
-   ========================================================= */
-const COUNTRIES = ['Узбекистан', 'Казахстан', 'Кыргызстан', 'Таджикистан', 'Россия', 'Турция', 'ОАЭ'].sort();
-const CITIES = {
-  'Узбекистан': ['Ташкент', 'Самарканд', 'Бухара', 'Наманган', 'Андижан', 'Фергана', 'Нукус'],
-  'Казахстан': ['Алматы', 'Астана', 'Шымкент']
-};
+<!-- ========================================== -->
+<!-- 5. Google Firebase SDK v12 (ES6 Modules)   -->
+<!-- ========================================== -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-app.js";
+  import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-analytics.js";
+  import { 
+      getFirestore, 
+      collection, 
+      addDoc, 
+      getDocs, 
+      query, 
+      where, 
+      onSnapshot,
+      doc,
+      updateDoc,
+      writeBatch
+  } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore.js";
 
-const pickerOverlay = document.getElementById('pickerOverlay');
-let pickerOnSelect = null;
+  const firebaseConfig = {
+      apiKey: "AIzaSyCFl9_bOVzbtZwNPOxaNJb3BfW2XB0Jpgg",
+      authDomain: "dating-uz.firebaseapp.com",
+      projectId: "dating-uz",
+      storageBucket: "dating-uz.firebasestorage.app",
+      messagingSenderId: "1046578611265",
+      appId: "1:1046578611265:web:97597ee1a45dc4d192f2c0",
+      measurementId: "G-NM2EGJH6DV"
+  };
 
-function openPicker(title, items, onSelect) {
-  document.getElementById('pickerTitle').textContent = title;
-  const list = document.getElementById('pickerList');
-  list.innerHTML = '';
-  pickerOnSelect = onSelect;
-  items.forEach(item => {
-    const btn = document.createElement('button');
-    btn.className = 'picker-item';
-    btn.textContent = item;
-    btn.onclick = () => { pickerOnSelect(item); pickerOverlay.classList.remove('show'); };
-    list.appendChild(btn);
-  });
-  pickerOverlay.classList.add('show');
-}
+  const app = initializeApp(firebaseConfig);
+  const analytics = getAnalytics(app);
+  const db = getFirestore(app);
 
-document.getElementById('pickerCloseBtn').onclick = () => pickerOverlay.classList.remove('show');
-document.getElementById('selectCountry').onclick = () => openPicker('Страна', COUNTRIES, (c) => document.getElementById('selectCountryLabel').textContent = c);
-document.getElementById('selectCity').onclick = () => {
-  let country = document.getElementById('selectCountryLabel').textContent;
-  openPicker('Город', CITIES[country] || ['Ташкент'], (ct) => document.getElementById('selectCityLabel').textContent = ct);
-};
+  window.saveProfileToFirebase = async function(profileData) {
+      try {
+          profileData.lastSeen = Date.now();
+          const docRef = await addDoc(collection(db, "users"), profileData);
+          console.log("Профиль сохранен с ID:", docRef.id);
+          return true;
+      } catch (e) {
+          console.error("Ошибка сохранения профиля:", e);
+          return false;
+      }
+  };
 
-/* =========================================================
-   INIT
-   ========================================================= */
-if (myProfile.name) {
-  document.getElementById('input-name').value = myProfile.name || '';
-  document.getElementById('input-age').value = myProfile.age || '';
-  document.getElementById('input-height').value = myProfile.height || '';
-  document.getElementById('input-weight').value = myProfile.weight || '';
-}
+  window.loadProfilesFromFirebase = async function() {
+      try {
+          const querySnapshot = await getDocs(collection(db, "users"));
+          const loadedProfiles = [];
+          querySnapshot.forEach((docSnap) => {
+              const data = docSnap.data();
+              if (data.name && data.name !== myProfile.name) {
+                  loadedProfiles.push({
+                      id: docSnap.id,
+                      name: data.name,
+                      age: data.age || 20,
+                      city: data.city || 'Не указан',
+                      height: data.height || 170,
+                      weight: data.weight || 60,
+                      compat: Math.floor(Math.random() * 25) + 75,
+                      quick: data.goal || 'Общение',
+                      topic: (data.tags && data.tags.length > 0) ? data.tags.join(', ') : 'Знакомства',
+                      photo: data.avatarPhoto || null
+                  });
+              }
+          });
+          return loadedProfiles;
+      } catch (e) {
+          console.error("Ошибка загрузки профилей:", e);
+          return [];
+      }
+  };
 
-renderStories();
-renderDeck();
-renderChatsList();
-setTimeout(loadFirebaseProfiles, 1500);
+  window.sendFirebaseMessage = async function(senderName, receiverName, messageText, type = 'text', extraData = {}) {
+      try {
+          await addDoc(collection(db, "messages"), {
+              sender: senderName,
+              receiver: receiverName,
+              text: messageText || '',
+              type: type,
+              timestamp: Date.now(),
+              isRead: false,
+              ...extraData
+          });
+      } catch (e) {
+          console.error("Ошибка отправки сообщения:", e);
+      }
+  };
+
+  window.loadAllUserChats = async function(currentUserName) {
+      try {
+          const q = query(collection(db, "messages"));
+          const snapshot = await getDocs(q);
+          const userMap = {};
+
+          snapshot.forEach(docSnap => {
+              const msg = docSnap.data();
+              let partner = null;
+              if (msg.sender === currentUserName) partner = msg.receiver;
+              else if (msg.receiver === currentUserName) partner = msg.sender;
+
+              if (partner) {
+                  if (!userMap[partner]) {
+                      userMap[partner] = {
+                          id: partner,
+                          name: partner,
+                          photo: null,
+                          messages: [],
+                          unreadCount: 0
+                      };
+                  }
+                  userMap[partner].messages.push({
+                      id: docSnap.id,
+                      dir: msg.sender === currentUserName ? 'out' : 'in',
+                      type: msg.type || 'text',
+                      text: msg.text,
+                      photo: msg.photo,
+                      video: msg.video,
+                      audio: msg.audio,
+                      duration: msg.duration,
+                      timestamp: msg.timestamp || 0,
+                      isRead: msg.isRead
+                  });
+
+                  if (msg.receiver === currentUserName && !msg.isRead) {
+                      userMap[partner].unreadCount++;
+                  }
+              }
+          });
+
+          return Object.values(userMap).map(c => {
+              c.messages.sort((a, b) => a.timestamp - b.timestamp);
+              return c;
+          });
+      } catch(e) {
+          console.error("Ошибка загрузки списков чата:", e);
+          return [];
+      }
+  };
+
+  window.listenFirebaseChat = function(currentUserName, partnerName, onNewMessageCallback) {
+      const q = query(collection(db, "messages"));
+      return onSnapshot(q, async (snapshot) => {
+          let messages = [];
+          const batch = writeBatch(db);
+          let hasUnreadToUpdate = false;
+
+          snapshot.forEach((docSnap) => {
+              const msg = docSnap.data();
+              if (
+                  (msg.sender === currentUserName && msg.receiver === partnerName) ||
+                  (msg.sender === partnerName && msg.receiver === currentUserName)
+              ) {
+                  messages.push({ id: docSnap.id, ...msg });
+
+                  // Помечаем входящие сообщения как прочитанные
+                  if (msg.receiver === currentUserName && !msg.isRead) {
+                      batch.update(doc(db, "messages", docSnap.id), { isRead: true });
+                      hasUnreadToUpdate = true;
+                  }
+              }
+          });
+
+          if (hasUnreadToUpdate) {
+              await batch.commit();
+          }
+
+          messages.sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
+          onNewMessageCallback(messages);
+      });
+  };
+
+  setTimeout(() => {
+    if (typeof loadAndRenderDeck === 'function') {
+      loadAndRenderDeck();
+    }
+  }, 300);
 </script>
 </body>
 </html>
