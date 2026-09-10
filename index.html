@@ -1722,175 +1722,160 @@ saveProfileBtn.addEventListener('click', async () => {
 </script>
 
 <!-- ========================================== -->
-<!-- 5. Google Firebase SDK v12 (ES6 Modules)   -->
+<!-- 5. Supabase SDK v2                         -->
 <!-- ========================================== -->
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-app.js";
-  import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-analytics.js";
-  import { 
-      getFirestore, 
-      collection, 
-      addDoc, 
-      getDocs, 
-      query, 
-      where, 
-      onSnapshot,
-      doc,
-      updateDoc,
-      writeBatch
-  } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore.js";
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  // Настройки подключения к Supabase
+  const SUPABASE_URL = 'https://zdrggxhlovoebumdnyyp.supabase.co';
+  const SUPABASE_KEY = 'ВСТАВЬТЕ_СЮДА_ВАШ_PUBLISHABLE_KEY'; // sb_publishable_...
+  const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-  const firebaseConfig = {
-      apiKey: "AIzaSyCFl9_bOVzbtZwNPOxaNJb3BfW2XB0Jpgg",
-      authDomain: "dating-uz.firebaseapp.com",
-      projectId: "dating-uz",
-      storageBucket: "dating-uz.firebasestorage.app",
-      messagingSenderId: "1046578611265",
-      appId: "1:1046578611265:web:97597ee1a45dc4d192f2c0",
-      measurementId: "G-NM2EGJH6DV"
-  };
-
-  const app = initializeApp(firebaseConfig);
-  const analytics = getAnalytics(app);
-  const db = getFirestore(app);
-
+  // 1. Сохранение профиля
   window.saveProfileToFirebase = async function(profileData) {
-      try {
-          profileData.lastSeen = Date.now();
-          const docRef = await addDoc(collection(db, "users"), profileData);
-          console.log("Профиль сохранен с ID:", docRef.id);
-          return true;
-      } catch (e) {
-          console.error("Ошибка сохранения профиля:", e);
-          return false;
-      }
+    try {
+      const payload = {
+        name: profileData.name || '',
+        age: profileData.age ? parseInt(profileData.age) : null,
+        city: profileData.city || '',
+        photoUrl: profileData.avatarPhoto || profileData.photoUrl || ''
+      };
+
+      const { data, error } = await sb.from('users').insert([payload]);
+      if (error) throw error;
+      console.log("Профиль сохранен в Supabase!");
+      return true;
+    } catch (e) {
+      console.error("Ошибка сохранения профиля:", e);
+      return false;
+    }
   };
 
+  // 2. Загрузка всех профилей для ленты
   window.loadProfilesFromFirebase = async function() {
-      try {
-          const querySnapshot = await getDocs(collection(db, "users"));
-          const loadedProfiles = [];
-          querySnapshot.forEach((docSnap) => {
-              const data = docSnap.data();
-              if (data.name && data.name !== myProfile.name) {
-                  loadedProfiles.push({
-                      id: docSnap.id,
-                      name: data.name,
-                      age: data.age || 20,
-                      city: data.city || 'Не указан',
-                      height: data.height || 170,
-                      weight: data.weight || 60,
-                      compat: Math.floor(Math.random() * 25) + 75,
-                      quick: data.goal || 'Общение',
-                      topic: (data.tags && data.tags.length > 0) ? data.tags.join(', ') : 'Знакомства',
-                      photo: data.avatarPhoto || null
-                  });
-              }
-          });
-          return loadedProfiles;
-      } catch (e) {
-          console.error("Ошибка загрузки профилей:", e);
-          return [];
-      }
+    try {
+      const { data, error } = await sb.from('users').select('*');
+      if (error) throw error;
+
+      return data
+        .filter(user => user.name && user.name !== myProfile.name)
+        .map(user => ({
+          id: String(user.id),
+          name: user.name,
+          age: user.age || 20,
+          city: user.city || 'Не указан',
+          height: 170,
+          weight: 60,
+          compat: Math.floor(Math.random() * 25) + 75,
+          quick: 'Общение',
+          topic: 'Знакомства',
+          photo: user.photoUrl || null
+        }));
+    } catch (e) {
+      console.error("Ошибка загрузки профилей из Supabase:", e);
+      return [];
+    }
   };
 
+  // 3. Отправка сообщений
   window.sendFirebaseMessage = async function(senderName, receiverName, messageText, type = 'text', extraData = {}) {
-      try {
-          await addDoc(collection(db, "messages"), {
-              sender: senderName,
-              receiver: receiverName,
-              text: messageText || '',
-              type: type,
-              timestamp: Date.now(),
-              isRead: false,
-              ...extraData
-          });
-      } catch (e) {
-          console.error("Ошибка отправки сообщения:", e);
-      }
+    try {
+      const { error } = await sb.from('messages').insert([{
+        sender: senderName,
+        receiver: receiverName,
+        text: messageText || '',
+        type: type,
+        timestamp: Date.now(),
+        isRead: false,
+        photo: extraData.photo || null,
+        video: extraData.video || null,
+        audio: extraData.audio || null,
+        duration: extraData.duration || null
+      }]);
+      if (error) throw error;
+    } catch (e) {
+      console.error("Ошибка отправки сообщения:", e);
+    }
   };
 
+  // 4. Загрузка списка чатов
   window.loadAllUserChats = async function(currentUserName) {
-      try {
-          const q = query(collection(db, "messages"));
-          const snapshot = await getDocs(q);
-          const userMap = {};
+    try {
+      const { data, error } = await sb.from('messages').select('*');
+      if (error) throw error;
 
-          snapshot.forEach(docSnap => {
-              const msg = docSnap.data();
-              let partner = null;
-              if (msg.sender === currentUserName) partner = msg.receiver;
-              else if (msg.receiver === currentUserName) partner = msg.sender;
+      const userMap = {};
+      data.forEach(msg => {
+        let partner = null;
+        if (msg.sender === currentUserName) partner = msg.receiver;
+        else if (msg.receiver === currentUserName) partner = msg.sender;
 
-              if (partner) {
-                  if (!userMap[partner]) {
-                      userMap[partner] = {
-                          id: partner,
-                          name: partner,
-                          photo: null,
-                          messages: [],
-                          unreadCount: 0
-                      };
-                  }
-                  userMap[partner].messages.push({
-                      id: docSnap.id,
-                      dir: msg.sender === currentUserName ? 'out' : 'in',
-                      type: msg.type || 'text',
-                      text: msg.text,
-                      photo: msg.photo,
-                      video: msg.video,
-                      audio: msg.audio,
-                      duration: msg.duration,
-                      timestamp: msg.timestamp || 0,
-                      isRead: msg.isRead
-                  });
-
-                  if (msg.receiver === currentUserName && !msg.isRead) {
-                      userMap[partner].unreadCount++;
-                  }
-              }
+        if (partner) {
+          if (!userMap[partner]) {
+            userMap[partner] = {
+              id: partner,
+              name: partner,
+              photo: null,
+              messages: [],
+              unreadCount: 0
+            };
+          }
+          userMap[partner].messages.push({
+            id: String(msg.id),
+            dir: msg.sender === currentUserName ? 'out' : 'in',
+            type: msg.type || 'text',
+            text: msg.text,
+            photo: msg.photo,
+            video: msg.video,
+            audio: msg.audio,
+            duration: msg.duration,
+            timestamp: msg.timestamp || 0,
+            isRead: msg.isRead
           });
 
-          return Object.values(userMap).map(c => {
-              c.messages.sort((a, b) => a.timestamp - b.timestamp);
-              return c;
-          });
-      } catch(e) {
-          console.error("Ошибка загрузки списков чата:", e);
-          return [];
-      }
+          if (msg.receiver === currentUserName && !msg.isRead) {
+            userMap[partner].unreadCount++;
+          }
+        }
+      });
+
+      return Object.values(userMap).map(c => {
+        c.messages.sort((a, b) => a.timestamp - b.timestamp);
+        return c;
+      });
+    } catch (e) {
+      console.error("Ошибка загрузки чатов:", e);
+      return [];
+    }
   };
 
+  // 5. Прослушивание чата в реальном времени (Realtime)
   window.listenFirebaseChat = function(currentUserName, partnerName, onNewMessageCallback) {
-      const q = query(collection(db, "messages"));
-      return onSnapshot(q, async (snapshot) => {
-          let messages = [];
-          const batch = writeBatch(db);
-          let hasUnreadToUpdate = false;
+    const fetchAndFilter = async () => {
+      const { data } = await sb.from('messages').select('*');
+      if (!data) return;
 
-          snapshot.forEach((docSnap) => {
-              const msg = docSnap.data();
-              if (
-                  (msg.sender === currentUserName && msg.receiver === partnerName) ||
-                  (msg.sender === partnerName && msg.receiver === currentUserName)
-              ) {
-                  messages.push({ id: docSnap.id, ...msg });
+      const filtered = data
+        .filter(m => 
+          (m.sender === currentUserName && m.receiver === partnerName) ||
+          (m.sender === partnerName && m.receiver === currentUserName)
+        )
+        .sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
 
-                  // Помечаем входящие сообщения как прочитанные
-                  if (msg.receiver === currentUserName && !msg.isRead) {
-                      batch.update(doc(db, "messages", docSnap.id), { isRead: true });
-                      hasUnreadToUpdate = true;
-                  }
-              }
-          });
+      onNewMessageCallback(filtered);
+    };
 
-          if (hasUnreadToUpdate) {
-              await batch.commit();
-          }
+    fetchAndFilter();
 
-          messages.sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
-          onNewMessageCallback(messages);
-      });
+    const channel = sb.channel('messages_changes')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'messages' }, () => {
+        fetchAndFilter();
+      })
+      .subscribe();
+
+    return () => {
+      sb.removeChannel(channel);
+    };
   };
 
   setTimeout(() => {
