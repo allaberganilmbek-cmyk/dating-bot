@@ -1711,7 +1711,12 @@ saveProfileBtn.addEventListener('click', async () => {
   myProfile.city = document.getElementById('selectCityLabel').textContent;
 
   if (window.saveProfileToFirebase) {
-    await window.saveProfileToFirebase(myProfile);
+    const isSaved = await window.saveProfileToFirebase(myProfile);
+    if (!isSaved) {
+      showToast('Ошибка при сохранении на сервер');
+      setSaveBtnState('is-error', 'Ошибка сохранения');
+      return;
+    }
   }
 
   renderStories();
@@ -1728,7 +1733,7 @@ saveProfileBtn.addEventListener('click', async () => {
 <script>
   // Настройки подключения к Supabase
   const SUPABASE_URL = 'https://zdrggxhlovoebumdnyyp.supabase.co';
-  const SUPABASE_KEY = 'sb_publishable_8lbK1fRnD_SR4NSGCLAJVA_ITgle'; // sb_publishable_...
+  const SUPABASE_KEY = 'sb_publishable_0lbK1fRnD_SR4NSGCLAjVA_1Igl0D2M'; // sb_publishable_... или anon key
   const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
   // 1. Сохранение профиля
@@ -1737,7 +1742,12 @@ saveProfileBtn.addEventListener('click', async () => {
       const payload = {
         name: profileData.name || '',
         age: profileData.age ? parseInt(profileData.age) : null,
+        height: profileData.height ? parseInt(profileData.height) : null,
+        weight: profileData.weight ? parseInt(profileData.weight) : null,
+        country: profileData.country || '',
         city: profileData.city || '',
+        goal: profileData.goal || '',
+        tags: profileData.tags || [],
         photoUrl: profileData.avatarPhoto || profileData.photoUrl || ''
       };
 
@@ -1764,11 +1774,11 @@ saveProfileBtn.addEventListener('click', async () => {
           name: user.name,
           age: user.age || 20,
           city: user.city || 'Не указан',
-          height: 170,
-          weight: 60,
+          height: user.height || 170,
+          weight: user.weight || 60,
           compat: Math.floor(Math.random() * 25) + 75,
-          quick: 'Общение',
-          topic: 'Знакомства',
+          quick: user.goal || 'Общение',
+          topic: (user.tags && user.tags.length) ? user.tags.join(', ') : 'Знакомства',
           photo: user.photoUrl || null
         }));
     } catch (e) {
