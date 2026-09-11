@@ -1873,17 +1873,6 @@ saveProfileBtn.addEventListener('click', async () => {
         .sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
 
       onNewMessageCallback(filtered);
-            // отмечаем прочитанными входящие сообщения, которые ещё не прочитаны
-      const unreadIncomingIds = filtered
-        .filter(m => m.receiver === currentUserName && !m.isRead)
-        .map(m => m.id);
-
-      if (unreadIncomingIds.length > 0) {
-        const { error } = await sb.from('messages')
-          .update({ isRead: true })
-          .in('id', unreadIncomingIds);
-        if (error) console.error('Ошибка при отметке прочитанным:', error);
-      }
     };
 
     fetchAndFilter();
